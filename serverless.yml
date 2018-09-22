@@ -1,0 +1,21 @@
+# Welcome to serverless. Read the docs
+# https://serverless.com/framework/docs/
+
+service: chatbot-find-meals
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+
+package:
+  exclude:
+    - bin
+  include:
+    - node_modules
+    - intents
+
+functions:
+  lex-validations:
+    handler: intents/find-meals.validations
+  lex-fulfillment:
+    handler: intents/find-meals.fulfillment

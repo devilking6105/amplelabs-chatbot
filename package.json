@@ -1,0 +1,38 @@
+{
+  "name": "chatbot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "standard && jest",
+    "lint": "standard --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/amplelabs/amplelabs-chatbot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/amplelabs/amplelabs-chatbot/issues"
+  },
+  "homepage": "https://github.com/amplelabs/amplelabs-chatbot#README",
+  "dependencies": {
+    "@google/maps": "^0.5.0",
+    "csvtojson": "^2.0.4",
+    "haversine": "^1.1.0",
+    "moment": "^2.22.2"
+  },
+  "devDependencies": {
+    "jest": "^23.2.0",
+    "standard": "^11.0.1"
+  },
+  "standard": {
+    "env": [
+      "jest"
+    ],
+    "ignore": [
+      "web-ui/*.js"
+    ]
+  }
+}

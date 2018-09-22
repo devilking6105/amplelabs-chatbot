@@ -1,0 +1,30 @@
+{
+  "cognito": {
+    "poolId": "us-east-1:b15ad8e4-7cbe-45c2-bf01-feae2d0dd02a"
+  },
+  "lex": {
+    "botName": "MinnaWebUiOrderFlowers",
+    "initialText": [
+      "Hello! My name is HomeTO, and I am here to help you find services around the city, be it a meal for the night or a spot to sleep.",
+      "What can I help you with?"
+    ],
+    "initialSpeechInstruction": "Say 'Find a meal' to get started"
+  },
+  "ui": {
+    "parentOrigin": "https://minnalex-web-ui-codebuilddeploy-1n37-webappbucket-1ngjqxo7amzf6.s3.amazonaws.com",
+    "toolbarTitle": "HomeTo",
+    "toolbarLogo": "",
+    "pushInitialTextOnRestart": false
+  },
+  "polly": {
+    "voiceId": "Salli"
+  },
+  "recorder": {
+    "preset": "speech_recognition"
+  },
+  "iframe": {
+    "iframeOrigin": "https://minnalex-web-ui-codebuilddeploy-1n37-webappbucket-1ngjqxo7amzf6.s3.amazonaws.com",
+    "iframeSrcPath": "/index.html#/?lexWebUiEmbed=true",
+    "shouldLoadIframeMinimized": true
+  }
+}
