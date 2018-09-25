@@ -19,9 +19,11 @@
   "homepage": "https://github.com/amplelabs/amplelabs-chatbot#README",
   "dependencies": {
     "@google/maps": "^0.5.0",
+    "compromise": "^11.12.0",
     "csvtojson": "^2.0.4",
     "haversine": "^1.1.0",
-    "moment": "^2.22.2"
+    "moment": "^2.22.2",
+    "moment-timezone": "^0.5.21"
   },
   "devDependencies": {
     "jest": "^23.2.0",

@@ -3,6 +3,7 @@ const DialogActions = require("./lib/dialog-actions");
 const Location = require("./lib/location");
 const DataLoader = require("./lib/data-loader");
 const MealFinder = require("./lib/meal-finder");
+const parseTime = require("./lib/getTime");
 
 class LocationFinder {
   constructor(event) {
@@ -70,8 +71,6 @@ class TimeParser {
   }
 
   getTime() {
-    if (this.slots.Date && this.slots.Time) return;
-
     if (this.slots.mealNow === "Now") {
       this.slots.Date = moment().format("YYYY-MM-DD");
       this.slots.Time = moment().format("HH:mm");
@@ -84,7 +83,6 @@ class Validator {
     this.event = event;
     this.slots = event.currentIntent.slots;
     this.sessionAttributes = event.sessionAttributes;
-    this.locationConfirmed = false;
 
     // if (this.event.inputTranscript === "Yes, allow GPS Location") {
     //   this.slots.useGPS = "Yes";
@@ -94,8 +92,35 @@ class Validator {
   }
 
   async validate() {
+    if (this.slots.mealNow == null) {
+      return DialogActions.buttonElicitSlot(
+        this.event.sessionAttributes,
+        "mealNow",
+        this.event.currentIntent.name,
+        this.slots,
+        "Are you looking for meals now?",
+        "now or later?",
+        ["Yes, it's for now.", "No, it's for a later time."],
+        ["Now", "Later"]
+      );
+      // return DialogActions.mealNow(
+      //   this.event.sessionAttributes,
+      //   "mealNow",
+      //   this.event.currentIntent.name,
+      //   this.slots
+      // );
+    }
     const location = await new LocationFinder(this.event).getLocation();
     const time = new TimeParser(this.event).getTime();
+
+    if (this.slots.Date == null) {
+      return DialogActions.delegate(this.slots);
+    }
+
+    if (this.slots.Time == null) {
+      this.slots.Time = parseTime.getTime(this.event.inputTranscript).miliTime;
+    }
+
     return this.validateLocation(location);
   }
 
@@ -123,10 +148,7 @@ class Validator {
         this.event.currentIntent.name,
         location.address
       );
-    } else if (
-      !this.locationConfirmed &&
-      this.event.currentIntent.confirmationStatus === "Denied"
-    ) {
+    } else if (this.event.currentIntent.confirmationStatus === "Denied") {
       return DialogActions.elicitSlot(
         this.event.sessionAttributes,
         "Intersection",
@@ -134,7 +156,6 @@ class Validator {
         { ...this.slots }
       );
     } else {
-      this.locationConfirmed = true;
       return DialogActions.delegate({
         ...this.slots,
         Latitude: location.latitude,
@@ -176,7 +197,7 @@ exports.fulfillment = async (event, context, callback) => {
     const meal = meals[0];
     const mealString =
       `The meal closest to you is ${formattedMeals} at ${meal.address}.` +
-      `The meal is ending in ${meal.endsIn()}, and it’s a ${meal.walkTime()} walk from where you are.`;
+      `The meal is ${meal.endsInText()}, and it’s a ${meal.walkTimeText()} walk from where you are.`;
 
     //callback(null, DialogActions.fulfill(mealString));
     callback(
