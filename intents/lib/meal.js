@@ -1,5 +1,5 @@
 const haversine = require("haversine");
-const moment = require("moment-timezone");
+const moment = require("moment");
 
 class Meal {
   static fromJson(orgInfo) {
@@ -23,8 +23,6 @@ class Meal {
     this.age = m.age;
     this.race = m.race;
     this.distance = m.distance;
-    this.toMealStartTime = m.toMealStartTime;
-    this.toMealEndTime = m.toMealEndTime;
   }
 
   addDistanceFrom(location) {
@@ -32,117 +30,25 @@ class Meal {
     this.distance = haversine(location, this, { unit: "meter" });
   }
 
-  // add 'time distance here'
-  addTimeMetrics(timeIn) {
-    if (timeIn === null || timeIn === undefined) {
-      // use meal start and end time instead
-      // undefined / null for toMealStartTime / toMealEndTime indicated no meal found
-      this.toMealStartTime = null;
-      this.toMealEndTime = null;
-      return null;
-    }
-    // put output in mins
-    // console.log(moment(this.startTime,"HH:mm").tz("America/Toronto").format("HH:mm"))
-    // console.log(moment(this.endTime,"HH:mm").tz("America/Toronto").format("HH:mm"))
-    // console.log(now.tz("America/Toronto").format("HH:mm"))
-
-    // console.log(`startin: ${this.toMealStartTime}`)
+  addTimeDiff(time) {
+    const msecToMin = 1.0 / 1000.0 / 60.0;
+    this.startTimeDiff =
+      moment(this.startTime, "HH:mm").diff(moment(time, "HH:mm")) * msecToMin;
+    this.endTimeDiff =
+      moment(this.endTime, "HH:mm").diff(moment(time, "HH:mm")) * msecToMin;
   }
 
-  startsIn() {
-    const msecToMin = 1.0 / 1000.0 / 60.0;
-    const now = () => {
-      const tmp = moment(t, "HH:mm").tz("America/Toronto");
-      // console.log(tmp.isValid())
-      // console.log(tmp.format("HH:mm"))
-      if (!tmp.isValid()) {
-        return moment().tz("America/Toronto"); // make a global constant js file for this
-      }
-      return tmp;
-    };
-    this.toMealStartTime = Math.floor(
-      moment(this.startTime, "HH:mm")
-        .tz("America/Toronto")
-        .diff(now) * msecToMin
-    );
-    return this.toMealStartTime;
-  }
-
-  endsIn() {
-    const msecToMin = 1.0 / 1000.0 / 60.0;
-    const now = () => {
-      const tmp = moment(t, "HH:mm").tz("America/Toronto");
-      // console.log(tmp.isValid())
-      // console.log(tmp.format("HH:mm"))
-      if (!tmp.isValid()) {
-        return moment().tz("America/Toronto"); // make a global constant js file for this
-      }
-      return tmp;
-    };
-
-    this.toMealEndTime = Math.floor(
-      moment(this.endTime, "HH:mm")
-        .tz("America/Toronto")
-        .diff(now) * msecToMin
-    );
-    return this.toMealEndTime;
-  }
-
-  startsInText() {
-    const msecToMin = 1.0 / 1000.0 / 60.0;
-    const now = () => {
-      const tmp = moment(t, "HH:mm").tz("America/Toronto");
-      // console.log(tmp.isValid())
-      // console.log(tmp.format("HH:mm"))
-      if (!tmp.isValid()) {
-        return moment().tz("America/Toronto"); // make a global constant js file for this
-      }
-      return tmp;
-    };
-
-    this.toMealStartTime = Math.floor(
-      moment(this.startTime, "HH:mm")
-        .tz("America/Toronto")
-        .diff(now) * msecToMin
-    );
-
-    if (this.toMealStartTime > 0) {
-      if (this.toMealStartTime < 59) {
-        return `is starting in ${this.toMealStartTime} min`;
-      } else {
-        return `is starting in ${Math.floor(
-          this.toMealStartTime / 60.0
-        )} hr and ${Math.floor(this.toMealStartTime % 60.0)} min`;
+  startsInText(isNow) {
+    if (isNow) {
+      if (this.startTimeDiff >= 0) {
+        return `is starting in ${this.startTimeDiff} min`;
+      } else if (this.endTimeDiff <= 60) {
+        return `is ending in ${this.endTimeDiff} min`;
       }
     } else {
-      return `started ${-this.toMealStartTime} min ago`;
-    }
-  }
-
-  endsInText() {
-    const msecToMin = 1.0 / 1000.0 / 60.0;
-    const now = () => {
-      const tmp = moment(t, "HH:mm").tz("America/Toronto");
-      // console.log(tmp.isValid())
-      // console.log(tmp.format("HH:mm"))
-      if (!tmp.isValid()) {
-        return moment().tz("America/Toronto"); // make a global constant js file for this
-      }
-      return tmp;
-    };
-
-    this.toMealEndTime = Math.floor(
-      moment(this.endTime, "HH:mm")
-        .tz("America/Toronto")
-        .diff(now) * msecToMin
-    );
-
-    if (this.toMealEndTime > 0 && this.toMealEndTime < 59) {
-      return `finishing in ${this.toMealEndTime} min`;
-    } else {
-      return `finishing in ${Math.floor(
-        this.toMealEndTime / 60.0
-      )} hr and ${Math.floor(this.toMealEndTime % 60.0)} min`;
+      const start = moment(this.startTime, "HH:mm").format("h:mm");
+      const end = moment(this.endTime, "HH:mm").format("h:mm");
+      return `will be served between ${start} to ${end}`;
     }
   }
 

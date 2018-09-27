@@ -103,12 +103,6 @@ class Validator {
         ["Yes, it's for now.", "No, it's for a later time."],
         ["Now", "Later"]
       );
-      // return DialogActions.mealNow(
-      //   this.event.sessionAttributes,
-      //   "mealNow",
-      //   this.event.currentIntent.name,
-      //   this.slots
-      // );
     }
     const location = await new LocationFinder(this.event).getLocation();
     const time = new TimeParser(this.event).getTime();
@@ -187,17 +181,27 @@ function formatMeals(closestMeals) {
 exports.fulfillment = async (event, context, callback) => {
   const location = await new LocationFinder(event).getLocation();
   const meals = DataLoader.meals();
-  const mealFinder = new MealFinder(meals, location);
+  const mealCounter = 0;
+  const mealFinder = new MealFinder(
+    meals,
+    location,
+    event.currentIntent.slots.Time
+  );
   const closestMeals = mealFinder.find(1);
 
   if (closestMeals.length === 0) {
-    callback(null, DialogActions.fulfill("There are no meals available."));
+    callback(
+      null,
+      DialogActions.fulfill("There are no meals available with in an hour.")
+    );
   } else {
     const formattedMeals = formatMeals(closestMeals);
-    const meal = meals[0];
+    const meal = closestMeals[0];
     const mealString =
       `The meal closest to you is ${formattedMeals} at ${meal.address}.` +
-      `The meal is ${meal.endsInText()}, and it’s a ${meal.walkTimeText()} walk from where you are.`;
+      `The meal ${meal.startsInText(
+        event.currentIntent.slots.mealNow === "Now" ? true : false
+      )}, and it’s a ${meal.walkTimeText()} walk from where you are.`;
 
     //callback(null, DialogActions.fulfill(mealString));
     callback(

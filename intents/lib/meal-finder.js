@@ -1,19 +1,35 @@
 class MealFinder {
-  constructor (meals, location) {
-    this.meals = meals
-    this.location = location
+  constructor(meals, location, time) {
+    this.meals = meals;
+    this.location = location;
+    this.time = time;
+    this.mealsInTime = [];
   }
 
-  find (numberOfMeals = 1) {
-    if (this.location.isOutsideToronto() || this.location.isUnknown()) { return [] }
+  find(numberOfMeals = 1) {
+    if (this.location.isOutsideToronto() || this.location.isUnknown()) {
+      return [];
+    }
 
-    this.meals
-      .forEach((meal) => meal.addDistanceFrom(this.location))
+    this.meals.forEach(meal => {
+      meal.addTimeDiff(this.time);
+      if (
+        (meal.startTimeDiff <= 60 && meal.startTimeDiff >= 0) ||
+        (meal.endTimeDiff <= 60 && meal.endTimeDiff >= 0)
+      ) {
+        meal.addDistanceFrom(this.location);
+        this.mealsInTime.push(meal);
+      }
+    });
 
-    return this.meals
-      .sort((x, y) => x.distance - y.distance)
-      .slice(0, numberOfMeals)
+    if (this.mealsInTime.length > 0) {
+      return this.mealsInTime
+        .sort((x, y) => x.distance - y.distance)
+        .slice(0, numberOfMeals);
+    } else {
+      return this.mealsInTime;
+    }
   }
 }
 
-module.exports = MealFinder
+module.exports = MealFinder;
