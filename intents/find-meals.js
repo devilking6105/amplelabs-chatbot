@@ -4,6 +4,12 @@ const Location = require("./lib/location");
 const DataLoader = require("./lib/data-loader");
 const MealFinder = require("./lib/meal-finder");
 const parseTime = require("./lib/getTime");
+let location;
+let meals;
+let mealCounter;
+let mealFinder;
+let meal;
+let closestMeals;
 
 class LocationFinder {
   constructor(event) {
@@ -135,14 +141,20 @@ class Validator {
       );
     }
 
-    if (this.event.currentIntent.confirmationStatus === "None") {
+    if (
+      this.event.currentIntent.confirmationStatus === "None" &&
+      this.slots.Confirmed !== "true"
+    ) {
       return DialogActions.confirmAddress(
         { ...this.slots },
         this.event.sessionAttributes,
         this.event.currentIntent.name,
         location.address
       );
-    } else if (this.event.currentIntent.confirmationStatus === "Denied") {
+    } else if (
+      this.event.currentIntent.confirmationStatus === "Denied" &&
+      this.slots.Confirmed !== "true"
+    ) {
       return DialogActions.elicitSlot(
         this.event.sessionAttributes,
         "Intersection",
@@ -150,6 +162,7 @@ class Validator {
         { ...this.slots }
       );
     } else {
+      this.slots.Confirmed = "true";
       return DialogActions.delegate({
         ...this.slots,
         Latitude: location.latitude,
@@ -179,15 +192,17 @@ function formatMeals(closestMeals) {
 }
 
 exports.fulfillment = async (event, context, callback) => {
-  const location = await new LocationFinder(event).getLocation();
-  const meals = DataLoader.meals();
-  const mealCounter = 0;
-  const mealFinder = new MealFinder(
-    meals,
-    location,
-    event.currentIntent.slots.Time
-  );
-  const closestMeals = mealFinder.find(1);
+  if (event.currentIntent.slots.ShowMore === "None") {
+    location = await new LocationFinder(event).getLocation();
+    meals = DataLoader.meals();
+    mealCounter = 0;
+    mealFinder = new MealFinder(
+      meals,
+      location,
+      event.currentIntent.slots.Time
+    );
+    closestMeals = await mealFinder.find();
+  }
 
   if (closestMeals.length === 0) {
     callback(
@@ -195,24 +210,40 @@ exports.fulfillment = async (event, context, callback) => {
       DialogActions.fulfill("There are no meals available with in an hour.")
     );
   } else {
-    const formattedMeals = formatMeals(closestMeals);
-    const meal = closestMeals[0];
-    const mealString =
-      `The meal closest to you is ${formattedMeals} at ${meal.address}.` +
+    //const formattedMeals = formatMeals(closestMeals);
+
+    if (event.currentIntent.slots.ShowMore === "More") {
+      mealCounter++;
+    }
+
+    try {
+      meal = closestMeals[mealCounter];
+    } catch (e) {
+      return DialogActions.fulfill("That's all meals I could find");
+    }
+    mealString =
+      `The meal closest to you is ${meal.organizationName} at ${
+        meal.address
+      }.` +
       `The meal ${meal.startsInText(
         event.currentIntent.slots.mealNow === "Now" ? true : false
       )}, and it’s a ${meal.walkTimeText()} walk from where you are.`;
 
     //callback(null, DialogActions.fulfill(mealString));
-    callback(
-      null,
-      DialogActions.displayMoreResult(
-        event.currentIntent.slots,
+
+    if (event.currentIntent.slots.ShowMore !== "Good") {
+      return DialogActions.buttonElicitSlot(
         event.sessionAttributes,
+        "ShowMore",
         event.currentIntent.name,
+        event.currentIntent.slots,
         mealString,
-        meal.address
-      )
-    );
+        "Would you like to see other options?",
+        ["Yes Please!", "No thanks, I like this one!"],
+        ["More", "Good"]
+      );
+    } else if (event.currentIntent.slots.ShowMore === "Good") {
+      callback(null, DialogActions.fulfill("Perfect!"));
+    }
   }
 };

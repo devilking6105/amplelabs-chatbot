@@ -6,7 +6,7 @@ class MealFinder {
     this.mealsInTime = [];
   }
 
-  find(numberOfMeals = 1) {
+  async find() {
     if (this.location.isOutsideToronto() || this.location.isUnknown()) {
       return [];
     }
@@ -23,9 +23,7 @@ class MealFinder {
     });
 
     if (this.mealsInTime.length > 0) {
-      return this.mealsInTime
-        .sort((x, y) => x.distance - y.distance)
-        .slice(0, numberOfMeals);
+      return this.mealsInTime.sort((x, y) => x.distance - y.distance);
     } else {
       return this.mealsInTime;
     }

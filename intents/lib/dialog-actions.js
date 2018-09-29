@@ -188,7 +188,7 @@ class DialogActions {
         type: "ConfirmIntent",
         message: {
           contentType: "PlainText",
-          content: `From your response, you are at ${address}, did I get that correct?`
+          content: `From your response, I see that you are at ${address}. Did I get that right?`
         },
         intentName: intentName,
         responseCard: {
