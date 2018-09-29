@@ -42,9 +42,11 @@ Our Chatbot is an app that helps you find local services in Toronto like free me
 
 | Slot Name   | Slot Type            | Required |
 | ----------- | -------------------- | -------- |
-| mealNow     | custom               | true     |
+| mealNow     | Custom               | true     |
 | Date        | AMAZON.DATE          | true     |
 | Time        | AMAZON.TIME          | true     |
 | Interaction | AMAZON.PostalAddress | true     |
 | Latitude    | AMAZON.NUMBER        | false    |
 | Longitude   | AMAZON.NUMBER        | false    |
+| ShowMore    | Custom               | false    |
+| Confirmed   | Custom               | false    |
