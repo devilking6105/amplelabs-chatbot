@@ -1,4 +1,4 @@
-const moment = require("moment");
+const moment = require("moment-timezone");
 const DialogActions = require("./lib/dialog-actions");
 const Location = require("./lib/location");
 const DataLoader = require("./lib/data-loader");
@@ -6,7 +6,7 @@ const MealFinder = require("./lib/meal-finder");
 const parseTime = require("./lib/getTime");
 let location;
 let meals;
-let mealCounter;
+let mealCounter = 0;
 let mealFinder;
 let meal;
 let closestMeals;
@@ -78,8 +78,12 @@ class TimeParser {
 
   getTime() {
     if (this.slots.mealNow === "Now") {
-      this.slots.Date = moment().format("YYYY-MM-DD");
-      this.slots.Time = moment().format("HH:mm");
+      this.slots.Date = moment()
+        .tz("America/New_York")
+        .format("YYYY-MM-DD");
+      this.slots.Time = moment()
+        .tz("America/New_York")
+        .format("HH:mm");
     }
   }
 }
@@ -126,7 +130,17 @@ class Validator {
 
   validateLocation(location) {
     if (location == null) {
-      return DialogActions.delegate(this.slots);
+      if (this.slots.mealNow === "Now") {
+        return DialogActions.delegate(this.slots);
+      } else {
+        return DialogActions.elicitSlot(
+          this.sessionAttributes,
+          "Intersection",
+          this.event.currentIntent.name,
+          this.slots,
+          "Where will you be at that time?"
+        );
+      }
     }
 
     if (location.isUnknown()) {
@@ -159,7 +173,8 @@ class Validator {
         this.event.sessionAttributes,
         "Intersection",
         this.event.currentIntent.name,
-        { ...this.slots }
+        { ...this.slots },
+        "Oops, I’m sorry about that! Can you tell me where you are? You can share an address, intersection, or landmark."
       );
     } else {
       this.slots.Confirmed = "true";
@@ -192,18 +207,10 @@ function formatMeals(closestMeals) {
 }
 
 exports.fulfillment = async (event, context, callback) => {
-  if (event.currentIntent.slots.ShowMore === "None") {
-    location = await new LocationFinder(event).getLocation();
-    meals = DataLoader.meals();
-    mealCounter = 0;
-    mealFinder = new MealFinder(
-      meals,
-      location,
-      event.currentIntent.slots.Time
-    );
-    closestMeals = await mealFinder.find();
-  }
-
+  location = await new LocationFinder(event).getLocation();
+  meals = await DataLoader.meals();
+  mealFinder = new MealFinder(meals, location, event.currentIntent.slots.Time);
+  closestMeals = await mealFinder.find();
   if (closestMeals.length === 0) {
     callback(
       null,
@@ -216,18 +223,21 @@ exports.fulfillment = async (event, context, callback) => {
       mealCounter++;
     }
 
-    try {
-      meal = closestMeals[mealCounter];
-    } catch (e) {
+    meal = closestMeals[mealCounter];
+
+    if (meal == null) {
       return DialogActions.fulfill("That's all meals I could find");
     }
     mealString =
       `The meal closest to you is ${meal.organizationName} at ${
         meal.address
       }.` +
-      `The meal ${meal.startsInText(
+      ` The meal ${meal.startsInText(
         event.currentIntent.slots.mealNow === "Now" ? true : false
-      )}, and it’s a ${meal.walkTimeText()} walk from where you are.`;
+      )}, and it’s a ${meal.walkTimeText()} walk from where you are.` +
+      ` If you like to, dial ${
+        meal.phonenumber
+      } to inquire about today's menu.`;
 
     //callback(null, DialogActions.fulfill(mealString));
 
