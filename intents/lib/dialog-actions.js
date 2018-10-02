@@ -33,7 +33,7 @@ class DialogActions {
     };
   }
 
-  static elicitSlot(sessionAttributes, slotName, intentName, slots) {
+  static elicitSlot(sessionAttributes, slotName, intentName, slots, message) {
     return {
       sessionAttributes: sessionAttributes,
       dialogAction: {
@@ -42,8 +42,7 @@ class DialogActions {
         intentName: intentName,
         message: {
           contentType: "PlainText",
-          content:
-            "Oops, I’m sorry about that! Can you tell me where you are? You can share an address, intersection, or landmark."
+          content: message
         },
         slots
       }
