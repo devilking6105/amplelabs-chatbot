@@ -23,6 +23,7 @@ class Meal {
     this.age = m.age;
     this.race = m.race;
     this.distance = m.distance;
+    this.phonenumber = m.phone_number;
   }
 
   addDistanceFrom(location) {
@@ -59,6 +60,10 @@ class Meal {
 
   walkTimeText() {
     return `${this.walkTime()} min`;
+  }
+
+  phoneNumber() {
+    return `Please call ${this.phonenumber} to check`;
   }
 }
 
