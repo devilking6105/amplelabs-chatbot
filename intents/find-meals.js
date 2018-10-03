@@ -114,6 +114,49 @@ class Validator {
         ["Now", "Later"]
       );
     }
+
+    if (this.slots.Eligibility == null) {
+      return DialogActions.buttonElicitSlot(
+        this.event.sessionAttributes,
+        "Eligibility",
+        this.event.currentIntent.name,
+        this.slots,
+        "Before we find a meal for you, you can answer a few more questions that might help us find a better option for you, based on your identity. Would you like to answer a few questions?",
+        "Feel free to skip any questions you don’t feel comfortable answering.",
+        ["Yes", "No"],
+        ["Yes", "No"]
+      );
+    }
+
+    if (
+      this.slots.Eligibility === "Yes" &&
+      this.slots.Age == null &&
+      this.slots.Gender == null
+    ) {
+      return DialogActions.elicitSlot(
+        this.event.sessionAttributes,
+        "Age",
+        this.event.currentIntent.name,
+        this.slots,
+        "How old are you?"
+      );
+    } else if (
+      this.slots.Eligibility === "Yes" &&
+      this.slots.Age != null &&
+      this.slots.Gender == null
+    ) {
+      return DialogActions.buttonElicitSlot(
+        this.event.sessionAttributes,
+        "Gender",
+        this.event.currentIntent.name,
+        this.slots,
+        "What is your gender?",
+        "Feel free to skip any questions you don’t feel comfortable answering.",
+        ["Male", "Female", "Trans", "LGBT", "Skip"],
+        ["male", "female", "trans", "LGBT", "mix"]
+      );
+    }
+
     const location = await new LocationFinder(this.event).getLocation();
     const time = new TimeParser(this.event).getTime();
 
@@ -123,6 +166,10 @@ class Validator {
 
     if (this.slots.Time == null) {
       this.slots.Time = parseTime.getTime(this.event.inputTranscript).miliTime;
+    }
+
+    if (this.slots.Time == null) {
+      return DialogActions.delegate(this.slots);
     }
 
     return this.validateLocation(location);
@@ -209,7 +256,13 @@ function formatMeals(closestMeals) {
 exports.fulfillment = async (event, context, callback) => {
   location = await new LocationFinder(event).getLocation();
   meals = await DataLoader.meals();
-  mealFinder = new MealFinder(meals, location, event.currentIntent.slots.Time);
+  mealFinder = new MealFinder(
+    meals,
+    location,
+    event.currentIntent.slots.Time,
+    event.currentIntent.slots.Age,
+    event.currentIntent.slots.Gender
+  );
   closestMeals = await mealFinder.find();
   if (closestMeals.length === 0) {
     callback(
