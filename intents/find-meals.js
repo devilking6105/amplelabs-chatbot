@@ -74,10 +74,11 @@ class TimeParser {
   constructor(event) {
     this.event = event;
     this.slots = event.currentIntent.slots;
+    this.now = ["now", "yes", "yeah", "ya"];
   }
 
   getTime() {
-    if (this.slots.mealNow === "Now") {
+    if (this.slots.mealNow === "Now" || this.slots.mealNow === "now") {
       this.slots.Date = moment()
         .tz("America/New_York")
         .format("YYYY-MM-DD");
@@ -93,6 +94,8 @@ class Validator {
     this.event = event;
     this.slots = event.currentIntent.slots;
     this.sessionAttributes = event.sessionAttributes;
+    this.yes = ["yes", "yeah", "sure", "okay"];
+    this.no = ["no", "nah"];
 
     // if (this.event.inputTranscript === "Yes, allow GPS Location") {
     //   this.slots.useGPS = "Yes";
@@ -102,7 +105,11 @@ class Validator {
   }
 
   async validate() {
-    if (this.slots.mealNow == null) {
+    if (
+      this.slots.mealNow == null &&
+      this.slots.Date == null &&
+      this.slots.Time == null
+    ) {
       return DialogActions.buttonElicitSlot(
         this.event.sessionAttributes,
         "mealNow",
@@ -113,9 +120,21 @@ class Validator {
         ["Yes, it's for now.", "No, it's for a later time."],
         ["Now", "Later"]
       );
+    } else {
+      this.slots.mealNow = "no";
     }
 
-    if (this.slots.Eligibility == null) {
+    if (this.slots.Time == null) {
+      return DialogActions.delegate(this.slots);
+    }
+
+    if (
+      (this.slots.Eligibility == null && this.slots.Gender == null) ||
+      (this.slots.Eligibility == null && this.slots.Age == null) ||
+      (this.slots.Eligibility == null &&
+        this.slots.Gender == null &&
+        this.slots.Age == null)
+    ) {
       return DialogActions.buttonElicitSlot(
         this.event.sessionAttributes,
         "Eligibility",
@@ -129,7 +148,8 @@ class Validator {
     }
 
     if (
-      this.slots.Eligibility === "Yes" &&
+      this.slots.Eligibility != null &&
+      this.yes.includes(this.slots.Eligibility.toLowerCase()) &&
       this.slots.Age == null &&
       this.slots.Gender == null
     ) {
@@ -141,7 +161,8 @@ class Validator {
         "How old are you?"
       );
     } else if (
-      this.slots.Eligibility === "Yes" &&
+      this.slots.Eligibility != null &&
+      this.yes.includes(this.slots.Eligibility.toLowerCase()) &&
       this.slots.Age != null &&
       this.slots.Gender == null
     ) {
@@ -155,6 +176,8 @@ class Validator {
         ["Male", "Female", "Trans", "LGBT", "Skip"],
         ["male", "female", "trans", "LGBT", "mix"]
       );
+    } else {
+      this.slots.Eligibility = "no";
     }
 
     const location = await new LocationFinder(this.event).getLocation();
