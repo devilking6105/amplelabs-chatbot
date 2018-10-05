@@ -17,11 +17,13 @@ describe('Location', () => {
     const coords = {longitude: -74.0059728, latitude: 40.7127753}
     const location = await Location.fromCoords(coords)
 
-    expect(location).toEqual({
-      longitude: -74.0059728,
-      latitude: 40.7127753,
-      city: 'New York',
-      address: 'New York City Hall, 11 Centre St, New York, NY 10007, USA'
+    // do a reverse lookup
+    // same gps coord could resolve into different but nearby
+    // addresses
+    const newCorrds = await Location.fromAddress(location.address)
+    expect(coords).toEqual({
+      longitude: newCorrds.longitude,
+      latitude: newCorrds.latitude
     })
   })
 

@@ -18,7 +18,7 @@ describe('Meal', () => {
 
       meal.addDistanceFrom(location)
 
-      expect(meal.distance).toBeCloseTo(137.365)
+      expect(meal.distance).toBeCloseTo(137365.6690651975) // in meters
     })
   })
 })
