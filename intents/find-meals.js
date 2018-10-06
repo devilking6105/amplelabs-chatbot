@@ -78,7 +78,10 @@ class TimeParser {
   }
 
   getTime() {
-    if (this.slots.mealNow === "Now" || this.slots.mealNow === "now") {
+    if (
+      this.slots.mealNow != null &&
+      this.now.includes(this.slots.mealNow.toLowerCase())
+    ) {
       this.slots.Date = moment()
         .tz("America/New_York")
         .format("YYYY-MM-DD");
@@ -96,12 +99,7 @@ class Validator {
     this.sessionAttributes = event.sessionAttributes;
     this.yes = ["yes", "yeah", "sure", "okay"];
     this.no = ["no", "nah"];
-
-    // if (this.event.inputTranscript === "Yes, allow GPS Location") {
-    //   this.slots.useGPS = "Yes";
-    // } else if (this.event.inputTranscript === "No, don't allow GPS Location") {
-    //   this.slots.useGPS = "No";
-    // }
+    this.now = ["now", "yes", "yeah", "ya"];
   }
 
   async validate() {
@@ -120,9 +118,9 @@ class Validator {
         ["Yes, it's for now.", "No, it's for a later time."],
         ["Now", "Later"]
       );
-    } else {
-      this.slots.mealNow = "no";
     }
+
+    const time = new TimeParser(this.event).getTime();
 
     if (this.slots.Time == null) {
       return DialogActions.delegate(this.slots);
@@ -181,7 +179,6 @@ class Validator {
     }
 
     const location = await new LocationFinder(this.event).getLocation();
-    const time = new TimeParser(this.event).getTime();
 
     if (this.slots.Date == null) {
       return DialogActions.delegate(this.slots);
@@ -200,7 +197,10 @@ class Validator {
 
   validateLocation(location) {
     if (location == null) {
-      if (this.slots.mealNow === "Now") {
+      if (
+        this.slots.mealNow != null &&
+        this.now.includes(this.slots.mealNow.toLowerCase())
+      ) {
         return DialogActions.delegate(this.slots);
       } else {
         return DialogActions.elicitSlot(
@@ -277,6 +277,8 @@ function formatMeals(closestMeals) {
 }
 
 exports.fulfillment = async (event, context, callback) => {
+  const more = ["more", "yes", "yeah", "okay", "sure", "ok", "ya", "please"];
+  const now = ["now", "yes", "yeah", "ya"];
   location = await new LocationFinder(event).getLocation();
   meals = await DataLoader.meals();
   mealFinder = new MealFinder(
@@ -293,9 +295,11 @@ exports.fulfillment = async (event, context, callback) => {
       DialogActions.fulfill("There are no meals available with in an hour.")
     );
   } else {
-    //const formattedMeals = formatMeals(closestMeals);
-
-    if (event.currentIntent.slots.ShowMore === "More") {
+    if (event.currentIntent.slots.ShowMore == null) {
+    } else if (
+      event.currentIntent.slots.ShowMore != null &&
+      more.includes(event.currentIntent.slots.ShowMore.toLowerCase())
+    ) {
       mealCounter++;
     }
 
@@ -309,26 +313,31 @@ exports.fulfillment = async (event, context, callback) => {
         meal.address
       }.` +
       ` The meal ${meal.startsInText(
-        event.currentIntent.slots.mealNow === "Now" ? true : false
+        event.currentIntent.slots.mealNow != null &&
+        now.includes(event.currentIntent.slots.mealNow.toLowerCase())
+          ? true
+          : false
       )}, and it’s a ${meal.walkTimeText()} walk from where you are.` +
       ` If you like to, dial ${
         meal.phonenumber
-      } to inquire about today's menu.`;
+      } to inquire about today's menu. Would you like to see other options?`;
 
-    //callback(null, DialogActions.fulfill(mealString));
+    if (
+      event.currentIntent.slots.ShowMore != null &&
+      !more.includes(event.currentIntent.slots.ShowMore.toLowerCase())
+    ) {
+      event.currentIntent.slots.ShowMore = "Good";
+    }
 
     if (event.currentIntent.slots.ShowMore !== "Good") {
-      return DialogActions.buttonElicitSlot(
+      return DialogActions.elicitSlot(
         event.sessionAttributes,
         "ShowMore",
         event.currentIntent.name,
         event.currentIntent.slots,
-        mealString,
-        "Would you like to see other options?",
-        ["Yes Please!", "No thanks, I like this one!"],
-        ["More", "Good"]
+        mealString
       );
-    } else if (event.currentIntent.slots.ShowMore === "Good") {
+    } else {
       callback(null, DialogActions.fulfill("Perfect!"));
     }
   }

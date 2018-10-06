@@ -145,40 +145,6 @@ class DialogActions {
     };
   }
 
-  static mealNow(sessionAttributes, slotName, intentName, slots) {
-    return {
-      sessionAttributes: sessionAttributes,
-      dialogAction: {
-        type: "ElicitSlot",
-        slotToElicit: slotName,
-        intentName: intentName,
-        message: {
-          contentType: "PlainText",
-          content: "Are you looking for meals now?"
-        },
-        responseCard: {
-          contentType: "application/vnd.amazonaws.card.generic",
-          genericAttachments: [
-            {
-              title: "now or later?",
-              buttons: [
-                {
-                  text: "Yes, it's for now.",
-                  value: "Now"
-                },
-                {
-                  text: "No, it's for later.",
-                  value: "Later"
-                }
-              ]
-            }
-          ]
-        },
-        slots
-      }
-    };
-  }
-
   static confirmAddress(slots, sessionAttributes, intentName, address) {
     const mapsUrl = MapsAdapter.mapsUrl(address);
     return {
