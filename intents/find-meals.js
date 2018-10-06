@@ -289,10 +289,16 @@ exports.fulfillment = async (event, context, callback) => {
     event.currentIntent.slots.Gender
   );
   closestMeals = await mealFinder.find();
-  if (closestMeals.length === 0) {
-    callback(
-      null,
-      DialogActions.fulfill("There are no meals available with in an hour.")
+  if (
+    closestMeals.length === 0 &&
+    event.currentIntent.slots.AltResult == null
+  ) {
+    return DialogActions.elicitSlot(
+      event.sessionAttributes,
+      "AltResult",
+      event.currentIntent.name,
+      event.currentIntent.slots,
+      "Unfortunately, there's no meals within an hour. Would you like to see next available meals?"
     );
   } else {
     if (event.currentIntent.slots.ShowMore == null) {
@@ -301,6 +307,24 @@ exports.fulfillment = async (event, context, callback) => {
       more.includes(event.currentIntent.slots.ShowMore.toLowerCase())
     ) {
       mealCounter++;
+    }
+
+    if (
+      event.currentIntent.slots.AltResult != null &&
+      more.includes(event.currentIntent.slots.AltResult.toLowerCase())
+    ) {
+      mealFinder = new MealFinder(
+        meals,
+        location,
+        event.currentIntent.slots.Time,
+        event.currentIntent.slots.Age,
+        event.currentIntent.slots.Gender
+      );
+      closestMeals = await mealFinder.findAlt();
+    } else if (event.currentIntent.slots.AltResult != null) {
+      return DialogActions.fulfill(
+        "Sorry about that, is there anything I can help you with?"
+      );
     }
 
     meal = closestMeals[mealCounter];
@@ -314,7 +338,8 @@ exports.fulfillment = async (event, context, callback) => {
       }.` +
       ` The meal ${meal.startsInText(
         event.currentIntent.slots.mealNow != null &&
-        now.includes(event.currentIntent.slots.mealNow.toLowerCase())
+        now.includes(event.currentIntent.slots.mealNow.toLowerCase()) &&
+        event.currentIntent.slots.AltResult == null
           ? true
           : false
       )}, and it’s a ${meal.walkTimeText()} walk from where you are.` +

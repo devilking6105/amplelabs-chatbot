@@ -12,6 +12,39 @@ class MealFinder {
     return age >= 16 && age <= 24 ? true : false;
   }
 
+  async findAlt() {
+    if (this.location.isOutsideToronto() || this.location.isUnknown()) {
+      return [];
+    }
+
+    this.meals.forEach(meal => {
+      meal.addTimeDiff(this.time);
+      if (this.isYouth(this.age)) {
+        if (meal.notes.includes("youth")) {
+          meal.addDistanceFrom(this.location);
+          this.mealsInTime.push(meal);
+        }
+      } else {
+        if (this.gender != null) {
+          if (meal.gender === this.gender) {
+            meal.addDistanceFrom(this.location);
+            this.mealsInTime.push(meal);
+          }
+        } else {
+          if (meal.gender === "mix") {
+            meal.addDistanceFrom(this.location);
+            this.mealsInTime.push(meal);
+          }
+        }
+      }
+    });
+    if (this.mealsInTime.length > 0) {
+      return this.mealsInTime.sort((x, y) => x.distance - y.distance);
+    } else {
+      return this.mealsInTime;
+    }
+  }
+
   async find() {
     if (this.location.isOutsideToronto() || this.location.isUnknown()) {
       return [];
