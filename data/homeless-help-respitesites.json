@@ -1,0 +1,189 @@
+{
+    "data": [
+        {
+            "address": "25 Augusta Ave (rear building) Toronto ON M5T 2K7",
+            "capacity": 50,
+            "eligibility": [
+                "mixed adult"
+            ],
+            "eligibilityNotes": "Pet friendly",
+            "email": "stfelixcentre@rogers.com",
+            "fid": "RS01",
+            "hours": "Mon-Sun 24 hours",
+            "latitude": 43.649078,
+            "longitude": -79.3995,
+            "orgName": "St. Felix Centre",
+            "phone": "416-203-1624",
+            "programName": "24-hour Respite Site Downtown West",
+            "service": "Respite",
+            "web": "www.stfelixcentre.ca"
+        },
+        {
+            "address": "323 Dundas St E Toronto ON M5A 2A2",
+            "capacity": 50,
+            "eligibility": [
+                "mixed adult"
+            ],
+            "eligibilityNotes": "Pet friendly",
+            "email": "info@margarets.ca",
+            "fid": "RS02",
+            "hours": "Mon-Sun 24 hours",
+            "latitude": 43.658417,
+            "longitude": -79.370218,
+            "orgName": "Margaret's Housing and Community Support Services",
+            "phone": "647-367-2100",
+            "programName": "24-hour Respite Site Downtown East",
+            "service": "Respite",
+            "web": "www.margarets.ca"
+        },
+        {
+            "address": "705 Progress Ave Unit 29 Toronto ON M1H 2X1",
+            "capacity": 49,
+            "eligibility": [
+                "mixed adult"
+            ],
+            "eligibilityNotes": "Pet friendly",
+            "email": "warden@wardenwoods.com",
+            "fid": "RS03",
+            "hours": "Mon-Sun 24 hours",
+            "latitude": 43.777039,
+            "longitude": -79.246013,
+            "orgName": "Warden Woods",
+            "phone": "416-639-6766",
+            "programName": "24-hour Respite Site Scarborough ",
+            "service": "Respite",
+            "web": "www.wardenwoods.com"
+        },
+        {
+            "address": "Church of the Epiphany and St. Mark's 201 Cowan Ave Toronto ON M6K 2N7 (rear entrance, lower level) ",
+            "capacity": 21,
+            "eligibility": [
+                "women"
+            ],
+            "eligibilityNotes": "Pet friendly",
+            "email": "info@dixonhall.org",
+            "fid": "RS04",
+            "hours": "Mon-Sun 24 hours",
+            "latitude": 43.640719,
+            "longitude": -79.432355,
+            "orgName": "Dixon Hall",
+            "phone": "416-901-8314",
+            "programName": "24-hour Respite Site Parkdale ",
+            "service": "Respite",
+            "web": "www.dixonhall.org"
+        },
+        {
+            "address": "21 Park Rd Toronto ON M4W 2N1",
+            "capacity": 30,
+            "eligibility": [
+                "mixed adult"
+            ],
+            "eligibilityNotes": "Pet friendly",
+            "email": "info@margarets.ca",
+            "fid": "RS06",
+            "hours": "Mon-Sun 24 hours",
+            "latitude": 43.672082,
+            "longitude": -79.384586,
+            "orgName": "Margaret's Housing and Community Support Services",
+            "phone": "416-525-7070",
+            "programName": "24-hour Respite Site Yonge Bloor",
+            "service": "Respite",
+            "web": "www.margarets.ca"
+        },
+        {
+            "address": "129 Peter St Toronto ON M5V 2H3",
+            "capacity": null,
+            "eligibility": [
+                "mixed adult"
+            ],
+            "eligibilityNotes": "",
+            "email": "sharc@toronto.ca",
+            "fid": "RS07",
+            "hours": "Mon-Sun 24 hours",
+            "latitude": 43.648697,
+            "longitude": -79.393274,
+            "orgName": "Shelter, Support and Housing Administration",
+            "phone": "Central Intake 416-338-4766, Administration 416-392-0090 ",
+            "programName": "Streets to Homes Assessment and Referral Centre",
+            "service": "Respite",
+            "specialMarker": {
+                "selectedUrl": "/resources/homelessness/img/special_marker.png",
+                "url": "/resources/homelessness/img/special_marker.png"
+            },
+            "web": ""
+        },
+        {
+            "address": "962 Bloor St W Toronto ON M6H 1L6",
+            "capacity": 50,
+            "eligibility": [
+                "women"
+            ],
+            "eligibilityNotes": "Pet friendly",
+            "email": "general_info@sistering.org",
+            "fid": "RS08",
+            "hours": "Mon-Sun 24 hours",
+            "latitude": 43.661586,
+            "longitude": -79.428873,
+            "orgName": "Sistering",
+            "phone": "416-926-9762",
+            "programName": "24-hour Respite Site Sistering Women's 24-hour drop in ",
+            "service": "Respite",
+            "web": "www.sistering.org"
+        },
+        {
+            "address": "Adelaide Resource Centre for Women, 67 Adelaide St E 1st Fl Toronto ON M5C 1K6 ",
+            "capacity": 67,
+            "eligibility": [
+                "women"
+            ],
+            "eligibilityNotes": "24+, Pet friendly",
+            "email": "wdp@fredvictor.org",
+            "fid": "RS09",
+            "hours": "Mon-Sun 24 hours",
+            "latitude": 43.650991,
+            "longitude": -79.375288,
+            "orgName": "Fred Victor Centre ",
+            "phone": "416-392-9292",
+            "programName": "24-hour Respite Site Fred Victor Centre Women's 24-hour drop-in",
+            "service": "Respite",
+            "web": "www.fredvictor.org"
+        },
+        {
+            "address": "354 George St Toronto ON M5A 2N3",
+            "capacity": 105,
+            "eligibility": [
+                "mixed adult"
+            ],
+            "eligibilityNotes": "Pet friendly",
+            "email": "admin@homesfirst.on.ca",
+            "fid": "RS11",
+            "hours": "Mon-Sun 24 hours",
+            "latitude": 43.659415,
+            "longitude": -79.374517,
+            "orgName": "Homes First",
+            "phone": "416-597-4523",
+            "programName": "24-hour Respite Site George Street",
+            "service": "Respite",
+            "web": "homesfirst.on.ca"
+        },
+        {
+            "address": "545 Lake Shore Blvd W Toronto, ON M5V 1A3",
+            "capacity": 100,
+            "eligibility": [
+                "mixed adult"
+            ],
+            "eligibilityNotes": "Pet friendly",
+            "email": "",
+            "fid": "RS13",
+            "hours": "Mon-Sun 24 hours, starting September 5, 2018",
+            "latitude": 43.63649,
+            "longitude": -79.398743,
+            "orgName": "Fred Victor Centre ",
+            "phone": "416-364-3910",
+            "programName": "24-hour Respite Site Lakeshore West",
+            "service": "Respite",
+            "web": "www.fredvictor.org"
+        }
+    ],
+    "differentPageTitle": "24-hour Respite Sites"
+}
