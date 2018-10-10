@@ -1,0 +1,314 @@
+{
+  "data": [
+    {
+      "orgName": "All Saints Church",
+      "programName": "",
+      "phone": "(416) 368-7768",
+      "address": "315 Dundas St. East (at Sherbourne)",
+      "web": "",
+      "email": "",
+      "hours": "Monday – Friday, 9 am – 1 pm",
+      "eligibilityNotes": "",
+      "services": "",
+      "latitude": 43.6583355,
+      "longitude": -79.37039900000002,
+      "clothing-dropin": [
+        {
+          "startTime": "09:00",
+          "endTime": "13:00",
+          "dayOfWeek": ["Mon", "Tue", "Wed", "Thu", "Fri"],
+          "type": "",
+          "notes": "na",
+          "gender": "mix",
+          "age": [],
+          "race": []
+        }
+      ]
+    },
+    {
+      "orgName": "Christian Resource Centre",
+      "programName": "",
+      "phone": "(416) 363-4234 ext. 243",
+      "address": "40 Oak Street (near Dundas & Parliament)",
+      "web": "http://tcrc.ca/drop-in/clothing-showers-laundry",
+      "email": "",
+      "hours": "",
+      "eligibilityNotes": "Tuesday & Thursday - Men: 9:30 - 11:30 am. Wednesday & Friday - Women : 9:30 - 11:30 am",
+      "services": "",
+      "latitude": 43.6614024,
+      "longitude": -79.36525560000001,
+      "clothing-dropin": [
+        {
+          "startTime": "09:30",
+          "endTime": "11:30",
+          "dayOfWeek": ["Tue", "Thu"],
+          "type": "",
+          "notes": "access seasonal clothing once per month; by appointment only",
+          "gender": "male",
+          "age": [],
+          "race": []
+        },
+        {
+          "startTime": "09:30",
+          "endTime": "11:30",
+          "dayOfWeek": ["Wed", "Fri"],
+          "type": "",
+          "notes": "access seasonal clothing once per month; by appointment only",
+          "gender": "female",
+          "age": [],
+          "race": []
+        }  
+      ]
+    },
+    {
+      "orgName": "Church in Regent Park",
+      "programName": "",
+      "phone": "416-203-7117",
+      "address": "40 Oak Street (near Dundas & Parliament)",
+      "web": "",
+      "email": "",
+      "hours": "Community Dinner: Saturdays 5-6:30 pm. Free clothing, 3:30-4:30pm",
+      "eligibilityNotes": "",
+      "services": "",
+      "latitude": 43.6614024,
+      "longitude": -79.36525560000001,
+      "clothing-dropin": [
+        {
+          "startTime": "15:30",
+          "endTime": "16:30",
+          "dayOfWeek": ["Sat"],
+          "type": "",
+          "notes": "",
+          "gender": "mix",
+          "age": [],
+          "race": []
+        }
+      ]
+    },
+    {
+      "orgName": "Council Fire Native Centre",
+      "programName": "",
+      "phone": "(416) 360-4350",
+      "address": "439 Dundas St. East (at Parliament)",
+      "web": "",
+      "email": "",
+      "hours": "",
+      "eligibilityNotes": "",
+      "services": "",
+      "latitude": 43.659154,
+      "longitude": -79.36617949999999,
+      "clothing-dropin": [
+        {
+          "startTime": "09:00",
+          "endTime": "16:30",
+          "dayOfWeek": ["Mon", "Tue", "Wed", "Thu"],
+          "type": "",
+          "notes": "",
+          "gender": "mix",
+          "age": [],
+          "race": []
+        },
+        {
+          "startTime": "09:00",
+          "endTime": "14:00",
+          "dayOfWeek": ["Fri", "Sun"],
+          "type": "",
+          "notes": "",
+          "gender": "mix",
+          "age": [],
+          "race": []
+        },
+        {
+          "startTime": "09:00",
+          "endTime": "15:00",
+          "dayOfWeek": ["Sat"],
+          "type": "",
+          "notes": "",
+          "gender": "mix",
+          "age": [],
+          "race": []
+        }
+      ]
+    },
+    {
+      "orgName": "Covenant House",
+      "programName": "",
+      "phone": "(416) 598-4898",
+      "address": "20 Gerrard St. East (at Yonge)",
+      "web": "",
+      "email": "",
+      "hours": "Monday – Thursday,  1:15-7 pm, Fri 1:15-5 pm",
+      "eligibilityNotes": "For youth 16-24 working with staff at the drop-in",
+      "services": "",
+      "latitude": 43.6594024,
+      "longitude": -79.38148839999997,
+      "clothing-dropin": [
+        {
+          "startTime": "13:15",
+          "endTime": "19:00",
+          "dayOfWeek": ["Mon", "Tue", "Wed", "Thu"],
+          "type": "",
+          "notes": "For youth 16-24 working with staff at the drop-in",
+          "gender": "mix",
+          "age": [16, 24],
+          "race": []
+        },
+        {
+          "startTime": "13:15",
+          "endTime": "17:00",
+          "dayOfWeek": ["Fri"],
+          "type": "",
+          "notes": "For youth 16-24 working with staff at the drop-in",
+          "gender": "mix",
+          "age": [16, 24],
+          "race": []
+        }
+      ]
+    },
+    {
+      "orgName": "519 Community Centre",
+      "programName": "",
+      "phone": "(416) 392-6878",
+      "address": "519 Church St. (at Wellesley)",
+      "web": "",
+      "email": "",
+      "hours": "Tuesday, 6 pm – 8 pm, Thursday, 1 pm – 7 pm",
+      "eligibilityNotes": "",
+      "services": "",
+      "latitude": 43.6665105,
+      "longitude": -79.38100450000002,
+      "clothing-dropin": [
+        {
+          "startTime": "18:00",
+          "endTime": "20:00",
+          "dayOfWeek": ["Tue"],
+          "type": "",
+          "notes": "",
+          "gender": "mix",
+          "age": [],
+          "race": []
+        },
+        {
+          "startTime": "13:00",
+          "endTime": "19:00",
+          "dayOfWeek": ["Thu"],
+          "type": "",
+          "notes": "",
+          "gender": "mix",
+          "age": [],
+          "race": []
+        }
+      ]
+    },
+    {
+      "orgName": "Adelaide Resource Centre for Women",
+      "programName": "Fred Victor Women’s Day Program",
+      "phone": "(416) 392-9292",
+      "address": "67 Adelaide St East (at Church)",
+      "web": "",
+      "email": "",
+      "hours": "Monday, 1 pm (until everyone has been served)",
+      "eligibilityNotes": "Women only",
+      "services": "",
+      "latitude": 43.65098580000001,
+      "longitude": -79.3752993,
+      "clothing-dropin": [
+        {
+          "startTime": "13:00",
+          "endTime": "18:00",
+          "dayOfWeek": ["Mon"],
+          "type": "",
+          "notes": "",
+          "gender": "female",
+          "age": [],
+          "race": []
+        }
+      ]
+    },
+    {
+      "orgName": "Good Shepherd Drop-in",
+      "programName": "",
+      "phone": "(416) 869-3619",
+      "address": "412 Queen St East",
+      "web": "",
+      "email": "",
+      "hours": "Monday – Friday,  9 am - 11 am ",
+      "eligibilityNotes": "",
+      "services": "",
+      "latitude": 43.6561511,
+      "longitude": -79.36252239999999,
+      "clothing-dropin": [
+        {
+          "startTime": "09:00",
+          "endTime": "11:00",
+          "dayOfWeek": ["Mon", "Tue", "Wed", "Thu", "Fri"],
+          "type": "",
+          "notes": "",
+          "gender": "",
+          "age": [],
+          "race": []
+        }
+      ]
+    },
+    {
+      "orgName": "Salvation Army –Gateway",
+      "programName": "",
+      "phone": "(416) 368-0324",
+      "address": "107 Jarvis St. (at Richmond)",
+      "web": "",
+      "email": "",
+      "hours": "Monday & Thursday, 5:30 pm – 6:30 pm",
+      "eligibilityNotes": "Must sign up at 3 pm; serves only the first 25 people on the list",
+      "services": "",
+      "latitude": 43.6523669,
+      "longitude": -79.37227250000001,
+      "clothing-dropin": [
+        {
+          "startTime": "17:30",
+          "endTime": "18:30",
+          "dayOfWeek": ["Mon", "Thu"],
+          "type": "",
+          "notes": "Must sign up at 3 pm; serves only the first 25 people on the list",
+          "gender": "",
+          "age": [],
+          "race": []
+        }
+      ]
+    },
+    {
+      "orgName": "Scott Mission",
+      "programName": "",
+      "phone": "(416) 923-3916",
+      "address": "502 Spadina Ave (at College)",
+      "web": "",
+      "email": "",
+      "hours": "Monday – Friday, 9:30 am - 11:15 am. Monday, Tuesday, Thursday, Friday    1:30 pm - 3:15 pm [Open to women only] Call to register",
+      "eligibilityNotes": "Call to register",
+      "services": "",
+      "latitude": 43.6585173,
+      "longitude": -79.4003831,
+      "clothing-dropin": [
+        {
+          "startTime": "09:30",
+          "endTime": "11:15",
+          "dayOfWeek": ["Mon", "Tue", "Wed", "Thu", "Fri"],
+          "type": "",
+          "notes": "Call to register",
+          "gender": "",
+          "age": [],
+          "race": []
+        },
+        {
+          "startTime": "13:30",
+          "endTime": "15:30",
+          "dayOfWeek": ["Mon", "Tue", "Thu", "Fri"],
+          "type": "",
+          "notes": "Call to register",
+          "gender": "Female",
+          "age": [],
+          "race": []
+        }
+      ]
+    }
+  ]
+}
