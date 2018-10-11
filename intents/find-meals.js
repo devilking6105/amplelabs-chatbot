@@ -29,6 +29,9 @@ class LocationFinder {
   async getKnownLocation() {
     if (!this.slots.Latitude || !this.slots.Longitude) return null;
 
+    if (this.slots.Confirmed !== "true" && this.slots.Intersection != null)
+      return null;
+
     try {
       return await Location.fromCoords({
         latitude: this.slots.Latitude,
@@ -40,18 +43,23 @@ class LocationFinder {
   }
 
   async getLocationFromGps() {
-    //if (this.slots.useGPS === "No") return;
-    try {
-      if (this.event.sessionAttributes.userPosition == null) return;
-    } catch (error) {}
+    if (this.slots.Confirmed !== "true" && this.slots.Intersection != null) {
+      return;
+    } else if (this.slots.Intersection != null) {
+      return;
+    } else {
+      try {
+        if (this.event.sessionAttributes.userPosition == null) return;
+      } catch (error) {}
 
-    try {
-      const parsedLocation = JSON.parse(
-        this.event.sessionAttributes.userPosition
-      );
-      return await Location.fromCoords(parsedLocation);
-    } catch (error) {
-      return false;
+      try {
+        const parsedLocation = JSON.parse(
+          this.event.sessionAttributes.userPosition
+        );
+        return await Location.fromCoords(parsedLocation);
+      } catch (error) {
+        return false;
+      }
     }
   }
 
@@ -126,6 +134,8 @@ class Validator {
       return DialogActions.delegate(this.slots);
     }
 
+    //Eligibility flow start
+
     if (
       (this.slots.Eligibility == null && this.slots.Gender == null) ||
       (this.slots.Eligibility == null && this.slots.Age == null) ||
@@ -177,6 +187,8 @@ class Validator {
     } else {
       this.slots.Eligibility = "no";
     }
+
+    //Eligibility flow done
 
     const location = await new LocationFinder(this.event).getLocation();
 
@@ -284,6 +296,7 @@ exports.fulfillment = async (event, context, callback) => {
   mealFinder = new MealFinder(
     meals,
     location,
+    moment(event.currentIntent.slots.Date).format("ddd"),
     event.currentIntent.slots.Time,
     event.currentIntent.slots.Age,
     event.currentIntent.slots.Gender
@@ -313,9 +326,16 @@ exports.fulfillment = async (event, context, callback) => {
       event.currentIntent.slots.AltResult != null &&
       more.includes(event.currentIntent.slots.AltResult.toLowerCase())
     ) {
+      let date =
+        event.currentIntent.slots.Time >= "21:00"
+          ? moment(event.currentIntent.slots.Date)
+              .add(1, "day")
+              .format("ddd")
+          : moment(event.currentIntent.slots.Date).format("ddd");
       mealFinder = new MealFinder(
         meals,
         location,
+        date,
         event.currentIntent.slots.Time,
         event.currentIntent.slots.Age,
         event.currentIntent.slots.Gender
@@ -336,16 +356,28 @@ exports.fulfillment = async (event, context, callback) => {
       `The meal closest to you is ${meal.organizationName} at ${
         meal.address
       }.` +
-      ` The meal ${meal.startsInText(
+      ` ${
+        event.currentIntent.slots.mealNow != null &&
+        now.includes(event.currentIntent.slots.mealNow.toLowerCase())
+          ? ""
+          : `${moment(event.currentIntent.slots.Date).format("LL")}, `
+      }the meal ${meal.startsInText(
         event.currentIntent.slots.mealNow != null &&
         now.includes(event.currentIntent.slots.mealNow.toLowerCase()) &&
         event.currentIntent.slots.AltResult == null
           ? true
           : false
-      )}, and it’s a ${meal.walkTimeText()} walk from where you are.` +
-      ` If you like to, dial ${
+      )}, and it’s ${meal.walkTimeText()} walk from where you are. ${
+        meal.notes === "na"
+          ? ""
+          : `Here's note from the facility: <b>${meal.notes}.</b>`
+      }` +
+      ` If you like to, dial <a href="tel:${meal.phonenumber.substring(
+        0,
+        12
+      )}">${
         meal.phonenumber
-      } to inquire about today's menu. Would you like to see other options?`;
+      }</a> to inquire about today's menu. Would you like to see other options?`;
 
     if (
       event.currentIntent.slots.ShowMore != null &&
@@ -355,12 +387,13 @@ exports.fulfillment = async (event, context, callback) => {
     }
 
     if (event.currentIntent.slots.ShowMore !== "Good") {
-      return DialogActions.elicitSlot(
-        event.sessionAttributes,
-        "ShowMore",
-        event.currentIntent.name,
+      return DialogActions.displayResultNav(
         event.currentIntent.slots,
-        mealString
+        event.sessionAttributes,
+        event.currentIntent.name,
+        "ShowMore",
+        mealString,
+        meal.address
       );
     } else {
       callback(null, DialogActions.fulfill("Perfect!"));
