@@ -59,17 +59,19 @@ class DialogActions {
     };
   }
 
-  static displayMoreResult(
+  static displayResultNav(
     slots,
     sessionAttributes,
     intentName,
+    slotName,
     content,
     mealAddress
   ) {
     return {
       sessionAttributes,
       dialogAction: {
-        type: "ConfirmIntent",
+        type: "ElicitSlot",
+        slotToElicit: slotName,
         message: {
           contentType: "PlainText",
           content: content
@@ -79,23 +81,14 @@ class DialogActions {
           contentType: "application/vnd.amazonaws.card.generic",
           genericAttachments: [
             {
-              title: "Would you like to see other options?",
+              title: "Direction",
+              subTitle: "Direction",
               attachmentLinkUrl:
                 "https://www.google.com/maps/dir/?api=1&origin=" +
                 slots.Intersection +
                 "%20Toronto&destination=" +
                 mealAddress +
-                "&travelmode=walking",
-              buttons: [
-                {
-                  text: "Yes please!",
-                  value: "Yes"
-                },
-                {
-                  text: "No thanks, I like this one!",
-                  value: "No"
-                }
-              ]
+                "&travelmode=walking"
             }
           ]
         },
@@ -136,6 +129,7 @@ class DialogActions {
           genericAttachments: [
             {
               title: cardTitle,
+              subTitle: null,
               buttons: textValuePair
             }
           ]
@@ -160,7 +154,8 @@ class DialogActions {
           contentType: "application/vnd.amazonaws.card.generic",
           genericAttachments: [
             {
-              title: "confirm your location",
+              title: null,
+              subTitle: null,
               imageUrl: mapsUrl,
               attachmentLinkUrl: mapsUrl,
               buttons: [
