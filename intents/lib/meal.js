@@ -42,24 +42,57 @@ class Meal {
   startsInText(isNow) {
     if (isNow) {
       if (this.startTimeDiff >= 0) {
-        return `is starting in ${this.startTimeDiff} min`;
-      } else if (this.endTimeDiff <= 60) {
-        return `is ending in ${this.endTimeDiff} min`;
+        return `is starting ${
+          this.startTimeDiff == 0
+            ? "now"
+            : `in ${
+                this.startTimeDiff > 60
+                  ? `${Math.floor(this.startTimeDiff / 60)} hours ${
+                      this.startTimeDiff % 60 === 0
+                        ? ""
+                        : `and ${this.startTimeDiff % 60} minutes`
+                    }`
+                  : `${this.startTimeDiff} minutes`
+              }`
+        }`;
+      } else if (this.endTimeDiff >= 30) {
+        return `is ending in ${
+          this.endTimeDiff > 60
+            ? `${Math.floor(this.endTimeDiff / 60)} hours and ${
+                this.endTimeDiff % 60 === 0
+                  ? ""
+                  : `${this.endTimeDiff % 60} minutes`
+              }`
+            : `${this.endTimeDiff} minutes`
+        }`;
       }
     } else {
-      const start = moment(this.startTime, "HH:mm").format("h:mm");
-      const end = moment(this.endTime, "HH:mm").format("h:mm");
-      return `will be served between ${start} to ${end}`;
+      const start = moment(this.startTime, "HH:mm").format("HH:mm");
+      const end = moment(this.endTime, "HH:mm").format("HH:mm");
+      const startText = moment(this.startTime, "HH:mm").format("h:mm");
+      const endText = moment(this.endTime, "HH:mm").format("h:mm");
+      return `will be served between ${
+        start >= "12:00" ? startText + " pm" : startText + " am"
+      } to ${end >= "12:00" ? endText + " pm" : endText + " am"}`;
     }
   }
 
   walkTime() {
-    const avgWalkingSpeed = 1.3; // m/sec (see google)
-    return Math.ceil((this.distance * avgWalkingSpeed) / 60.0);
+    const avgWalkingSpeed = 1.1; // m/sec (see google)
+    const magicNumber = 0.7747234935;
+    return Math.ceil(((this.distance * avgWalkingSpeed) / 60.0) * magicNumber);
   }
 
   walkTimeText() {
-    return `${this.walkTime()} min`;
+    return `about ${
+      this.walkTime() > 60
+        ? `${Math.floor(this.walkTime() / 60)} hours ${
+            this.walkTime() % 60 === 0
+              ? ``
+              : ` and ${this.walkTime() % 60} minutes`
+          }`
+        : `${this.walkTime()} minutes`
+    }`;
   }
 
   phoneNumber() {

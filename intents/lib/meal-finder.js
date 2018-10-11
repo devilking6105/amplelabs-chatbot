@@ -1,7 +1,8 @@
 class MealFinder {
-  constructor(meals, location, time, age, gender) {
+  constructor(meals, location, date, time, age, gender) {
     this.meals = meals;
     this.location = location;
+    this.date = date;
     this.time = time;
     this.gender = gender;
     this.age = age;
@@ -20,18 +21,24 @@ class MealFinder {
     this.meals.forEach(meal => {
       meal.addTimeDiff(this.time);
       if (this.isYouth(this.age)) {
-        if (meal.notes.includes("youth")) {
+        if (
+          (meal.notes.includes("youth") || meal.gender === this.gender) &&
+          meal.dayOfWeek.includes(this.date)
+        ) {
           meal.addDistanceFrom(this.location);
           this.mealsInTime.push(meal);
         }
       } else {
         if (this.gender != null) {
-          if (meal.gender === this.gender) {
+          if (
+            meal.gender === this.gender &&
+            meal.dayOfWeek.includes(this.date)
+          ) {
             meal.addDistanceFrom(this.location);
             this.mealsInTime.push(meal);
           }
         } else {
-          if (meal.gender === "mix") {
+          if (meal.gender === "mix" && meal.dayOfWeek.includes(this.date)) {
             meal.addDistanceFrom(this.location);
             this.mealsInTime.push(meal);
           }
@@ -56,8 +63,9 @@ class MealFinder {
       if (this.isYouth(this.age)) {
         if (
           ((meal.startTimeDiff <= 60 && meal.startTimeDiff >= 0) ||
-            (meal.endTimeDiff <= 60 && meal.endTimeDiff >= 0)) &&
-          meal.notes.includes("youth")
+            (meal.endTimeDiff <= 60 && meal.endTimeDiff >= 30)) &&
+          (meal.notes.includes("youth") || meal.gender === this.gender) &&
+          meal.dayOfWeek.includes(this.date)
         ) {
           meal.addDistanceFrom(this.location);
           this.mealsInTime.push(meal);
@@ -67,8 +75,9 @@ class MealFinder {
         if (this.gender != null) {
           if (
             ((meal.startTimeDiff <= 60 && meal.startTimeDiff >= 0) ||
-              (meal.endTimeDiff <= 60 && meal.endTimeDiff >= 0)) &&
-            meal.gender === this.gender
+              (meal.endTimeDiff <= 60 && meal.endTimeDiff >= 30)) &&
+            meal.gender === this.gender &&
+            meal.dayOfWeek.includes(this.date)
           ) {
             meal.addDistanceFrom(this.location);
             this.mealsInTime.push(meal);
@@ -77,8 +86,9 @@ class MealFinder {
           //if user didn't want to disclose about their gender, get mix gender options
           if (
             ((meal.startTimeDiff <= 60 && meal.startTimeDiff >= 0) ||
-              (meal.endTimeDiff <= 60 && meal.endTimeDiff >= 0)) &&
-            meal.gender === "mix"
+              (meal.endTimeDiff <= 60 && meal.endTimeDiff >= 30)) &&
+            meal.gender === "mix" &&
+            meal.dayOfWeek.includes(this.date)
           ) {
             meal.addDistanceFrom(this.location);
             this.mealsInTime.push(meal);
