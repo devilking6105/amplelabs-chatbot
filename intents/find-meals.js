@@ -131,7 +131,7 @@ class Validator {
     const time = new TimeParser(this.event).getTime();
 
     if (this.slots.Time == null) {
-      return DialogActions.delegate(this.slots);
+      return DialogActions.delegate(this.slots, this.event.sessionAttributes);
     }
 
     //Eligibility flow start
@@ -193,7 +193,7 @@ class Validator {
     const location = await new LocationFinder(this.event).getLocation();
 
     if (this.slots.Date == null) {
-      return DialogActions.delegate(this.slots);
+      return DialogActions.delegate(this.slots, this.event.sessionAttributes);
     }
 
     if (this.slots.Time == null) {
@@ -201,7 +201,7 @@ class Validator {
     }
 
     if (this.slots.Time == null) {
-      return DialogActions.delegate(this.slots);
+      return DialogActions.delegate(this.slots, this.event.sessionAttributes);
     }
 
     return this.validateLocation(location);
@@ -213,7 +213,7 @@ class Validator {
         this.slots.mealNow != null &&
         this.now.includes(this.slots.mealNow.toLowerCase())
       ) {
-        return DialogActions.delegate(this.slots);
+        return DialogActions.delegate(this.slots, this.event.sessionAttributes);
       } else {
         return DialogActions.elicitSlot(
           this.sessionAttributes,
@@ -260,18 +260,17 @@ class Validator {
       );
     } else {
       this.slots.Confirmed = "true";
-      return DialogActions.delegate({
-        ...this.slots,
-        Latitude: location.latitude,
-        Longitude: location.longitude,
-        Intersection: location.address
-      });
+      return DialogActions.delegate(
+        this.event.currentIntent.slots,
+        this.event.sessionAttributes
+      );
     }
   }
 }
 
 exports.validations = async (event, context, callback) => {
   try {
+    mealCounter = 0;
     const validator = new Validator(event);
     let response = await validator.validate();
     callback(null, response);
@@ -350,7 +349,8 @@ exports.fulfillment = async (event, context, callback) => {
     meal = closestMeals[mealCounter];
 
     if (meal == null) {
-      return DialogActions.fulfill("That's all meals I could find");
+      mealCounter = 0;
+      return DialogActions.fulfill(`That's all meals I could find`);
     }
     mealString =
       `The meal closest to you is ${meal.organizationName} at ${

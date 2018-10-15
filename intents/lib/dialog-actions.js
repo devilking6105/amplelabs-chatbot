@@ -176,8 +176,9 @@ class DialogActions {
     };
   }
 
-  static delegate(slots) {
+  static delegate(slots, sessionAttributes) {
     return {
+      sessionAttributes: sessionAttributes,
       dialogAction: {
         type: "Delegate",
         slots
