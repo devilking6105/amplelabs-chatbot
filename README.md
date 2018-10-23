@@ -2,7 +2,7 @@
 
 ## Project Description
 
-Our Chatbot is an app that helps you find local services in Toronto like free meals offered at drop-ins or shelters based on your specific real-time needs, location, and situation. The app also allows you to share valuable tips among other members and bookmark your personalized results for future reference on-the-go. You can find more information about Amplelabs at amplelabs.co
+ChalmersBot is a chatbot that helps you find local services in Toronto like free meals offered at drop-ins or shelters based on your specific real-time needs, location, and situation. The bot also allows you to share valuable tips among other members and bookmark your personalized results for future reference on-the-go. You can find more information about Amplelabs at amplelabs.co
 
 ## Contributors for the project
 
@@ -12,10 +12,10 @@ Our Chatbot is an app that helps you find local services in Toronto like free me
 
 ## Demo
 
-- Go to https://amplelabsbot-codebuilddeploy-au35j9j-webappbucket-1dvh6599n8mcp.s3.amazonaws.com/index.html
-- Currently only one skill is available and is only available in Toronto, ON Canada; type "free meal"
-- When asking when do you want your meals, you can type "Now" if you are looking for one now or specify specific date and time
-- After you specify time, enter your location, and the chatbot will output nearest soup kitchens near by the location
+- Go to https://amplebot-3d467.firebaseapp.com/#/
+- Enable GPS location from your browser, or specify your location when the bot is asking.
+- Currently only one skill is available and is only available in Toronto, ON Canada.
+- You can always type "help" to see what bot can do.
 
 ## Setup
 
@@ -38,15 +38,21 @@ Our Chatbot is an app that helps you find local services in Toronto like free me
 - Log into the AWS control panel
 - Configure the correct lexbot to use the necessary lambda
 
-## Required Lex Slots
+## Lex Slots
 
-| Slot Name   | Slot Type            | Required |
-| ----------- | -------------------- | -------- |
-| mealNow     | Custom               | true     |
-| Date        | AMAZON.DATE          | true     |
-| Time        | AMAZON.TIME          | true     |
-| Interaction | AMAZON.PostalAddress | true     |
-| Latitude    | AMAZON.NUMBER        | false    |
-| Longitude   | AMAZON.NUMBER        | false    |
-| ShowMore    | Custom               | false    |
-| Confirmed   | Custom               | false    |
+| Slot Name    | Slot Type            | Required | Description                                          |
+| ------------ | -------------------- | -------- | ---------------------------------------------------- |
+| mealNow      | Custom               | false    | Used to see if users want to find meals now          |
+| UseGPS       | Custom               | true     | Used to ask users if bot can grab their GPS location |
+| Date         | AMAZON.DATE          | false    | Date for meals                                       |
+| Time         | AMAZON.TIME          | false    | Time for meals                                       |
+| Eligibility  | Custom               | false    | Eligibility for meals                                |
+| Interaction  | AMAZON.PostalAddress | false    | Users' location                                      |
+| Latitude     | AMAZON.NUMBER        | false    | Latitude of User location                            |
+| Longitude    | AMAZON.NUMBER        | false    | Longitude of User location                           |
+| ShowMore     | Custom               | false    | Used to show more meal options                       |
+| Confirmed    | Custom               | false    | Used to skip validation flow                         |
+| Age          | AMAZON.NUMBER        | false    | Age eligibility for meals                            |
+| Gender       | Custom               | false    | Gender eligibility for meals                         |
+| AltResult    | Custom               | false    | Used to give alternative meal result                 |
+| InitFeedback | Custom               | false    | Used to initiate feedback flow                       |
