@@ -59,7 +59,7 @@ class DialogActions {
     };
   }
 
-  static displayResultNav(
+  static displayResultBtn(
     slots,
     sessionAttributes,
     intentName,
@@ -81,8 +81,20 @@ class DialogActions {
           contentType: "application/vnd.amazonaws.card.generic",
           genericAttachments: [
             {
-              title: "Direction",
-              subTitle: "Direction",
+              buttons: [
+                { text: "Show me more", value: "more" },
+                { text: "Another time", value: "Another" },
+                { text: "This is fine", value: "Good" }
+              ],
+              title: "Directions",
+              subTitle: "Directions",
+              imageUrl:
+                "https://maps.googleapis.com/maps/api/staticmap?zoom=14&size=600x300&maptype=roadmap&markers=color:red%7Clabel:A%7C" +
+                slots.Intersection +
+                "2c&markers=color:blue%7Clabel:A%7C" +
+                mealAddress +
+                "2c&key=" +
+                process.env.GOOGLE_MAPS_KEY,
               attachmentLinkUrl:
                 "https://www.google.com/maps/dir/?api=1&origin=" +
                 slots.Intersection +
@@ -147,7 +159,7 @@ class DialogActions {
         type: "ConfirmIntent",
         message: {
           contentType: "PlainText",
-          content: `From your response, I see that you are at ${address}. Did I get that right?`
+          content: `Just to confirm, you are at ${address}. Did I get that right?`
         },
         intentName: intentName,
         responseCard: {
@@ -160,7 +172,7 @@ class DialogActions {
               attachmentLinkUrl: mapsUrl,
               buttons: [
                 {
-                  text: "Yes, that's right",
+                  text: "Yes",
                   value: "Yes"
                 },
                 {
