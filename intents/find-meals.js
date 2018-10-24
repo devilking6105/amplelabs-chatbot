@@ -477,7 +477,8 @@ exports.fulfillment = async (event, context, callback) => {
         "Feedback",
         "FeedbackFlow",
         {
-          Feedback: event.inputTranscript
+          Feedback: event.inputTranscript,
+          Restart: null
         },
         "Great! Glad I could help :)! ## Do you have any feedback for me or suggestions of things I should learn?"
       );
