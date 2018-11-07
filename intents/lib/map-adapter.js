@@ -4,8 +4,11 @@ const googleMapsClient = require("@google/maps").createClient({
 });
 
 const getMapsImageUrl = address => {
-  let url =
-    "https://maps.googleapis.com/maps/api/staticmap?zoom=18&size=600x300&maptype=roadmap&markers=color:red%7Clabel:A%7C";
+  let url = `https://maps.googleapis.com/maps/api/staticmap?center=${
+    address.latitude == null
+      ? address
+      : address.latitude + "," + address.longitude
+  }&zoom=18&size=600x300&maptype=roadmap&markers=color:red%7Clabel:A%7C`;
   url +=
     address.latitude == null
       ? address

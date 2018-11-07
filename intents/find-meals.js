@@ -67,8 +67,8 @@ class LocationFinder {
   }
 
   async getLocationFromSlots() {
+    if (this.slots.useGPS === "Yes") return;
     if (this.slots.Intesection != null) return;
-
     try {
       return await Location.fromAddress(this.slots.Intersection + " Toronto");
     } catch (error) {
@@ -110,23 +110,6 @@ class Validator {
   }
 
   async validate() {
-    // if (
-    //   this.slots.mealNow == null &&
-    //   this.slots.Date == null &&
-    //   this.slots.Time == null
-    // ) {
-    //   return DialogActions.buttonElicitSlot(
-    //     this.event.sessionAttributes,
-    //     "mealNow",
-    //     this.event.currentIntent.name,
-    //     this.slots,
-    //     "Are you looking for meals now?",
-    //     "now or later?",
-    //     ["Yes, it's for now.", "No, it's for a later time."],
-    //     ["Now", "Later"]
-    //   );
-    // }
-
     if (this.slots.useGPS == null) {
       return DialogActions.buttonElicitSlot(
         this.event.sessionAttributes,
@@ -154,7 +137,7 @@ class Validator {
         "Intersection",
         this.event.currentIntent.name,
         this.slots,
-        "I need a location to recommend a meal for you. ## Can you give me a intersection or landmark? E.g. Dundas and Yonge or King Station."
+        "I need a location to recommend a meal for you. ## Can you give me a intersection or landmark? E.g. Yonge and Dundas or King Station."
       );
     }
 
@@ -163,13 +146,28 @@ class Validator {
     if (
       this.slots.useGPS === "Yes" &&
       this.event.currentIntent.confirmationStatus === "None" &&
-      this.slots.Confirmed !== "true"
+      this.slots.Confirmed !== "true" &&
+      location != null
     ) {
       return DialogActions.confirmAddress(
         { ...this.slots },
         this.event.sessionAttributes,
         this.event.currentIntent.name,
         location.address
+      );
+    } else if (
+      this.slots.useGPS === "Yes" &&
+      this.event.currentIntent.confirmationStatus === "None" &&
+      this.slots.Confirmed !== "true" &&
+      location == null
+    ) {
+      this.slots.useGPS = "No";
+      return DialogActions.elicitSlot(
+        this.sessionAttributes,
+        "Intersection",
+        this.event.currentIntent.name,
+        this.slots,
+        "Unfortunately, I couldn't locate your GPS. ## Can you give me a intersection or landmark? E.g. Yonge and Dundas or King Station."
       );
     }
 
@@ -179,93 +177,18 @@ class Validator {
       return DialogActions.delegate(this.slots, this.event.sessionAttributes);
     }
 
-    //Eligibility flow start
-
-    // if (
-    //   (this.slots.Eligibility == null && this.slots.Gender == null) ||
-    //   (this.slots.Eligibility == null && this.slots.Age == null) ||
-    //   (this.slots.Eligibility == null &&
-    //     this.slots.Gender == null &&
-    //     this.slots.Age == null)
-    // ) {
-    //   return DialogActions.buttonElicitSlot(
-    //     this.event.sessionAttributes,
-    //     "Eligibility",
-    //     this.event.currentIntent.name,
-    //     this.slots,
-    //     "Before we find a meal for you, you can answer a few more questions that might help us find a better option for you, based on your identity. ## Would you like to answer a few questions?",
-    //     "Feel free to skip any questions you don’t feel comfortable answering.",
-    //     ["Yes", "No"],
-    //     ["Yes", "No"]
-    //   );
-    // }
-
-    // if (
-    //   this.slots.Eligibility != null &&
-    //   this.yes.includes(this.slots.Eligibility.toLowerCase()) &&
-    //   this.slots.Age == null &&
-    //   this.slots.Gender == null
-    // ) {
-    //   return DialogActions.elicitSlot(
-    //     this.event.sessionAttributes,
-    //     "Age",
-    //     this.event.currentIntent.name,
-    //     this.slots,
-    //     "How old are you?"
-    //   );
-    // } else if (
-    //   this.slots.Eligibility != null &&
-    //   this.yes.includes(this.slots.Eligibility.toLowerCase()) &&
-    //   this.slots.Age != null &&
-    //   this.slots.Gender == null
-    // ) {
-    //   return DialogActions.buttonElicitSlot(
-    //     this.event.sessionAttributes,
-    //     "Gender",
-    //     this.event.currentIntent.name,
-    //     this.slots,
-    //     "What is your gender?",
-    //     "Feel free to skip any questions you don’t feel comfortable answering.",
-    //     ["Male", "Female", "Trans", "LGBT", "Skip"],
-    //     ["male", "female", "trans", "LGBT", "mix"]
-    //   );
-    // } else {
-    //   this.slots.Eligibility = "no";
-    // }
-
-    //Eligibility flow done
-
-    // if (this.slots.Date == null) {
-    //   return DialogActions.delegate(this.slots, this.event.sessionAttributes);
-    // }
-
-    // if (this.slots.Time == null) {
-    //   this.slots.Time = parseTime.getTime(this.event.inputTranscript).miliTime;
-    // }
-
-    // if (this.slots.Time == null) {
-    //   return DialogActions.delegate(this.slots, this.event.sessionAttributes);
-    // }
-
     return this.validateLocation(location);
   }
 
   validateLocation(location) {
-    if (location == null) {
-      if (
-        this.slots.mealNow != null &&
-        this.now.includes(this.slots.mealNow.toLowerCase())
-      ) {
-        return DialogActions.delegate(this.slots, this.event.sessionAttributes);
-      } else {
-        return DialogActions.elicitSlot(
-          this.sessionAttributes,
-          "Intersection",
-          this.event.currentIntent.name,
-          this.slots,
-          "Where will you be at that time?"
-        );
-      }
+    if (location.address === "57 Atomic Ave, Etobicoke, ON M8Z 5K8, Canada") {
+      return DialogActions.elicitSlot(
+        this.sessionAttributes,
+        "Intersection",
+        this.event.currentIntent.name,
+        this.slots,
+        "I couldn't locate the address you provided. ## Can you give me an intersection, or landmark? E.g. Yonge and Dundas or King Station"
+      );
     }
 
     if (location.isUnknown()) {
@@ -299,7 +222,7 @@ class Validator {
         "Intersection",
         this.event.currentIntent.name,
         { ...this.slots },
-        "Let's try again. Can you give me an intersection, or landmark? E.g. Dundas and Yonge or King Station"
+        "Let's try again. Can you give me an intersection, or landmark? E.g. Yonge and Dundas or King Station"
       );
     } else {
       this.slots.Confirmed = "true";
@@ -366,6 +289,7 @@ exports.fulfillment = async (event, context, callback) => {
     closestMeals.length === 0 &&
     event.currentIntent.slots.AltResult == null
   ) {
+    event.currentIntent.slots.mealNow = "no";
     event.currentIntent.slots.AltResult = "yes";
   }
 
@@ -375,6 +299,7 @@ exports.fulfillment = async (event, context, callback) => {
     more.includes(event.currentIntent.slots.ShowMore.toLowerCase())
   ) {
     mealCounter++;
+    event.currentIntent.slots.AltResult = "no";
   }
 
   if (
@@ -412,19 +337,19 @@ exports.fulfillment = async (event, context, callback) => {
     }` +
     `A free meal closest to you is ${meal.organizationName} at ${
       meal.address
-    }.` +
+    }. ## ` +
     ` ${
       event.currentIntent.slots.mealNow != null &&
       now.includes(event.currentIntent.slots.mealNow.toLowerCase())
         ? ""
-        : `${moment(event.currentIntent.slots.Date).format("LL")}, `
-    } ## The meal ${meal.startsInText(
+        : `On ${moment(event.currentIntent.slots.Date).format("LL")}, `
+    } the meal ${meal.startsInText(
       event.currentIntent.slots.mealNow != null &&
       now.includes(event.currentIntent.slots.mealNow.toLowerCase()) &&
       event.currentIntent.slots.AltResult == null
         ? true
         : false
-    )} and it’s ${meal.walkTimeText()} walk from where you are. ## ${
+    )}. ## ${
       meal.notes === "na"
         ? "The agency serves for everyone."
         : `The agency serves people that are: <b>${meal.notes}.</b>`
@@ -433,7 +358,8 @@ exports.fulfillment = async (event, context, callback) => {
       meal.phonenumber
     }</a> to find out more information.`;
 
-  if (event.currentIntent.slots.ShowMore === "Another") {
+  if (event.currentIntent.slots.ShowMore === "time") {
+    mealCounter = 0;
     event.currentIntent.slots.Time = null;
     event.currentIntent.slots.ShowMore = null;
     event.currentIntent.slots.AltResult = null;
@@ -451,10 +377,10 @@ exports.fulfillment = async (event, context, callback) => {
     event.currentIntent.slots.ShowMore != null &&
     !more.includes(event.currentIntent.slots.ShowMore.toLowerCase())
   ) {
-    event.currentIntent.slots.ShowMore = "Good";
+    event.currentIntent.slots.ShowMore = "fine";
   }
 
-  if (event.currentIntent.slots.ShowMore !== "Good") {
+  if (event.currentIntent.slots.ShowMore !== "fine") {
     return DialogActions.displayResultBtn(
       event.currentIntent.slots,
       event.sessionAttributes,
@@ -480,7 +406,7 @@ exports.fulfillment = async (event, context, callback) => {
           Feedback: event.inputTranscript,
           Restart: null
         },
-        "Great! Glad I could help :)! ## Do you have any feedback for me or suggestions of things I should learn?"
+        "Great! Glad I could help! ## Do you have any feedback for me or suggestions of things I should learn?"
       );
     }
     callback(null, DialogActions.fulfill("Perfect!"));

@@ -83,18 +83,12 @@ class DialogActions {
             {
               buttons: [
                 { text: "Show me more", value: "more" },
-                { text: "Another time", value: "Another" },
-                { text: "This is fine", value: "Good" }
+                { text: "Another time", value: "time" },
+                { text: "This is fine", value: "fine" }
               ],
               title: "Directions",
               subTitle: "Directions",
-              imageUrl:
-                "https://maps.googleapis.com/maps/api/staticmap?zoom=14&size=600x300&maptype=roadmap&markers=color:red%7Clabel:A%7C" +
-                slots.Intersection +
-                "2c&markers=color:blue%7Clabel:A%7C" +
-                mealAddress +
-                "2c&key=" +
-                process.env.GOOGLE_MAPS_KEY,
+              imageUrl: MapsAdapter.mapsUrl(mealAddress),
               attachmentLinkUrl:
                 "https://www.google.com/maps/dir/?api=1&origin=" +
                 slots.Intersection +
@@ -176,7 +170,7 @@ class DialogActions {
                   value: "Yes"
                 },
                 {
-                  text: "No, wrong location",
+                  text: "No",
                   value: "No"
                 }
               ]
