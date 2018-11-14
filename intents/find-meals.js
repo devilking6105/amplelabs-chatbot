@@ -181,14 +181,11 @@ class Validator {
   }
 
   validateLocation(location) {
-    if (location.address === "57 Atomic Ave, Etobicoke, ON M8Z 5K8, Canada") {
-      return DialogActions.elicitSlot(
-        this.sessionAttributes,
-        "Intersection",
-        this.event.currentIntent.name,
-        this.slots,
-        "I couldn't locate the address you provided. ## Can you give me an intersection, or landmark? E.g. Yonge and Dundas or King Station"
-      );
+    console.log(`The location is ${location.address}`);
+    if (location.address === "Toronto, ON, Canada") {
+      this.event.currentIntent.confirmationStatus = "Confirmed";
+      this.slots.Confirmed = true;
+      this.slots.Intersection = "default";
     }
 
     if (location.isUnknown()) {
@@ -276,21 +273,34 @@ exports.fulfillment = async (event, context, callback) => {
   const now = ["now", "yes", "yeah", "ya"];
   location = await new LocationFinder(event).getLocation();
   meals = await DataLoader.meals();
-  mealFinder = new MealFinder(
-    meals,
-    location,
-    moment(event.currentIntent.slots.Date).format("ddd"),
-    event.currentIntent.slots.Time,
-    event.currentIntent.slots.Age,
-    event.currentIntent.slots.Gender
-  );
-  closestMeals = await mealFinder.find();
-  if (
-    closestMeals.length === 0 &&
-    event.currentIntent.slots.AltResult == null
-  ) {
+  if (mealCounter == 0) {
+    mealFinder = new MealFinder(
+      meals,
+      location,
+      moment(event.currentIntent.slots.Date).format("ddd"),
+      event.currentIntent.slots.Time,
+      event.currentIntent.slots.Age,
+      event.currentIntent.slots.Gender
+    );
+    closestMeals = await mealFinder.find();
+  }
+
+  if (closestMeals.length === 0) {
     event.currentIntent.slots.mealNow = "no";
+    event.currentIntent.slots.Time = "05:00";
     event.currentIntent.slots.AltResult = "yes";
+    event.currentIntent.slots.Date = moment(event.currentIntent.slots.Date)
+      .add(1, "day")
+      .format("YYYY-MM-DD");
+    mealFinder = new MealFinder(
+      meals,
+      location,
+      moment(event.currentIntent.slots.Date).format("ddd"),
+      event.currentIntent.slots.Time,
+      event.currentIntent.slots.Age,
+      event.currentIntent.slots.Gender
+    );
+    closestMeals = await mealFinder.findAlt();
   }
 
   if (event.currentIntent.slots.ShowMore == null) {
@@ -299,40 +309,25 @@ exports.fulfillment = async (event, context, callback) => {
     more.includes(event.currentIntent.slots.ShowMore.toLowerCase())
   ) {
     mealCounter++;
-    event.currentIntent.slots.AltResult = "no";
-  }
-
-  if (
-    event.currentIntent.slots.AltResult != null &&
-    more.includes(event.currentIntent.slots.AltResult.toLowerCase())
-  ) {
-    let date =
-      event.currentIntent.slots.Time >= "20:00"
-        ? moment(event.currentIntent.slots.Date)
-            .add(1, "day")
-            .format("ddd")
-        : moment(event.currentIntent.slots.Date).format("ddd");
-    mealFinder = new MealFinder(
-      meals,
-      location,
-      date,
-      event.currentIntent.slots.Time,
-      event.currentIntent.slots.Age,
-      event.currentIntent.slots.Gender
-    );
-    closestMeals = await mealFinder.findAlt();
   }
 
   meal = closestMeals[mealCounter];
 
   if (meal == null) {
     mealCounter = 0;
-    return DialogActions.fulfill(`That's all meals I could find`);
+    return DialogActions.fulfill(
+      `That's all meals I could find for the day. ## Please contact <a href="tel:211">2-1-1</a> by phone if you still need help finding a meal. ## Can I help you with anything else?`
+    );
   }
   mealString =
     `${
-      event.currentIntent.slots.AltResult === "yes"
-        ? "There's no meals available within an hour. Here's next available meal. ## "
+      event.currentIntent.slots.Intersection === "default" && mealCounter === 0
+        ? "Here are meals available in Toronto. ## "
+        : ""
+    }` +
+    `${
+      event.currentIntent.slots.AltResult === "yes" && mealCounter === 0
+        ? "There's no more meals available today. Here's next available meal. ## "
         : ""
     }` +
     `A free meal closest to you is ${meal.organizationName} at ${
@@ -345,8 +340,8 @@ exports.fulfillment = async (event, context, callback) => {
         : `On ${moment(event.currentIntent.slots.Date).format("LL")}, `
     } the meal ${meal.startsInText(
       event.currentIntent.slots.mealNow != null &&
-      now.includes(event.currentIntent.slots.mealNow.toLowerCase()) &&
-      event.currentIntent.slots.AltResult == null
+        now.includes(event.currentIntent.slots.mealNow.toLowerCase()) &&
+        event.currentIntent.slots.AltResult == null
         ? true
         : false
     )}. ## ${
