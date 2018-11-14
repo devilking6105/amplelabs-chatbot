@@ -38,7 +38,14 @@ class MealFinder {
             this.mealsInTime.push(meal);
           }
         } else {
-          if (meal.gender === "mix" && meal.dayOfWeek.includes(this.date)) {
+          if (
+            (meal.startTimeDiff >= 0 ||
+              (meal.startTime < this.time &&
+                this.time < meal.endTime &&
+                meal.endTimeDiff >= 30)) &&
+            meal.gender === "mix" &&
+            meal.dayOfWeek.includes(this.date)
+          ) {
             meal.addDistanceFrom(this.location);
             this.mealsInTime.push(meal);
           }
@@ -46,7 +53,37 @@ class MealFinder {
       }
     });
     if (this.mealsInTime.length > 0) {
-      return this.mealsInTime.sort((x, y) => x.distance - y.distance);
+      return this.mealsInTime.sort((x, y) =>
+        x.startTime < y.startTime ? -1 : 1
+      );
+    } else {
+      return this.mealsInTime;
+    }
+  }
+
+  async findCloserTime() {
+    if (this.location.isOutsideToronto() || this.location.isUnknown()) {
+      return [];
+    }
+
+    this.meals.forEach(meal => {
+      meal.addTimeDiff(this.time);
+
+      //if user didn't want to disclose about their gender, get mix gender options
+      if (
+        meal.startTimeDiff >= 0 &&
+        meal.gender === "mix" &&
+        meal.dayOfWeek.includes(this.date)
+      ) {
+        meal.addDistanceFrom(this.location);
+        this.mealsInTime.push(meal);
+      }
+    });
+
+    if (this.mealsInTime.length > 0) {
+      return this.mealsInTime.sort((x, y) =>
+        x.startTime < y.startTime ? -1 : 1
+      );
     } else {
       return this.mealsInTime;
     }
@@ -85,8 +122,10 @@ class MealFinder {
         } else {
           //if user didn't want to disclose about their gender, get mix gender options
           if (
-            ((meal.startTimeDiff <= 60 && meal.startTimeDiff >= 0) ||
-              (meal.endTimeDiff <= 60 && meal.endTimeDiff >= 30)) &&
+            (meal.startTimeDiff >= 0 ||
+              (meal.startTime < this.time &&
+                this.time < meal.endTime &&
+                meal.endTimeDiff >= 30)) &&
             meal.gender === "mix" &&
             meal.dayOfWeek.includes(this.date)
           ) {
@@ -98,7 +137,9 @@ class MealFinder {
     });
 
     if (this.mealsInTime.length > 0) {
-      return this.mealsInTime.sort((x, y) => x.distance - y.distance);
+      return this.mealsInTime.sort((x, y) =>
+        x.startTime < y.startTime ? -1 : 1
+      );
     } else {
       return this.mealsInTime;
     }
