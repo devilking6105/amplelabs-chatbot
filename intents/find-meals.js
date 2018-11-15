@@ -7,7 +7,6 @@ const parseTime = require("./lib/getTime");
 const startDura = new Date().getTime();
 let location;
 let meals;
-let mealCounter = 0;
 let mealFinder;
 let meal;
 let closestMeals;
@@ -233,7 +232,7 @@ class Validator {
 
 exports.validations = async (event, context, callback) => {
   try {
-    mealCounter = 0;
+    event.currentIntent.slots.MealCounter = 0;
     const validator = new Validator(event);
     let response = await validator.validate();
     callback(null, response);
@@ -273,7 +272,7 @@ exports.fulfillment = async (event, context, callback) => {
   const now = ["now", "yes", "yeah", "ya"];
   location = await new LocationFinder(event).getLocation();
   meals = await DataLoader.meals();
-  if (mealCounter == 0) {
+  if (event.currentIntent.slots.MealCounter == 0) {
     mealFinder = new MealFinder(
       meals,
       location,
@@ -287,7 +286,7 @@ exports.fulfillment = async (event, context, callback) => {
 
   if (closestMeals.length === 0) {
     event.currentIntent.slots.mealNow = "no";
-    event.currentIntent.slots.Time = "05:00";
+    event.currentIntent.slots.Time = "00:00";
     event.currentIntent.slots.AltResult = "yes";
     event.currentIntent.slots.Date = moment(event.currentIntent.slots.Date)
       .add(1, "day")
@@ -308,25 +307,26 @@ exports.fulfillment = async (event, context, callback) => {
     event.currentIntent.slots.ShowMore != null &&
     more.includes(event.currentIntent.slots.ShowMore.toLowerCase())
   ) {
-    mealCounter++;
+    event.currentIntent.slots.MealCounter++;
   }
 
-  meal = closestMeals[mealCounter];
+  meal = closestMeals[event.currentIntent.slots.MealCounter];
 
   if (meal == null) {
-    mealCounter = 0;
     return DialogActions.fulfill(
       `That's all meals I could find for the day. ## Please contact <a href="tel:211">2-1-1</a> by phone if you still need help finding a meal. ## Can I help you with anything else?`
     );
   }
   mealString =
     `${
-      event.currentIntent.slots.Intersection === "default" && mealCounter === 0
+      event.currentIntent.slots.Intersection === "default" &&
+      event.currentIntent.slots.MealCounter == 0
         ? "Here are meals available in Toronto. ## "
         : ""
     }` +
     `${
-      event.currentIntent.slots.AltResult === "yes" && mealCounter === 0
+      event.currentIntent.slots.AltResult === "yes" &&
+      event.currentIntent.slots.MealCounter == 0
         ? "There's no more meals available today. Here's next available meal. ## "
         : ""
     }` +
@@ -354,7 +354,7 @@ exports.fulfillment = async (event, context, callback) => {
     }</a> to find out more information.`;
 
   if (event.currentIntent.slots.ShowMore === "time") {
-    mealCounter = 0;
+    event.currentIntent.slots.MealCounter = 0;
     event.currentIntent.slots.Time = null;
     event.currentIntent.slots.ShowMore = null;
     event.currentIntent.slots.AltResult = null;
