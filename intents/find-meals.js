@@ -330,7 +330,7 @@ exports.fulfillment = async (event, context, callback) => {
         ? "There's no more meals available today. Here's next available meal. ## "
         : ""
     }` +
-    `A free meal closest to you is ${meal.organizationName} at ${
+    `A free meal closest to you is at ${meal.organizationName} at ${
       meal.address
     }. ## ` +
     ` ${
@@ -338,7 +338,7 @@ exports.fulfillment = async (event, context, callback) => {
       now.includes(event.currentIntent.slots.mealNow.toLowerCase())
         ? ""
         : `On ${moment(event.currentIntent.slots.Date).format("LL")}, `
-    } the meal ${meal.startsInText(
+    } The meal ${meal.startsInText(
       event.currentIntent.slots.mealNow != null &&
         now.includes(event.currentIntent.slots.mealNow.toLowerCase()) &&
         event.currentIntent.slots.AltResult == null
@@ -364,7 +364,7 @@ exports.fulfillment = async (event, context, callback) => {
       "Date",
       event.currentIntent.name,
       event.currentIntent.slots,
-      "Okay, I can help you look for something that's at different time. What time are you looking for? E.g. Tomorrow at 1pm"
+      "Okay, I can help you look for something at a different time. What time are you looking for? E.g. Tomorrow at 1pm"
     );
   }
 
