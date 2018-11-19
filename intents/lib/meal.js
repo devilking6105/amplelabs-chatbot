@@ -42,7 +42,7 @@ class Meal {
   startsInText(isNow) {
     if (isNow) {
       if (this.startTimeDiff >= 0) {
-        return `is starting ${
+        return `starts in ${
           this.startTimeDiff == 0
             ? "now"
             : `in ${
@@ -56,7 +56,7 @@ class Meal {
               }`
         }`;
       } else if (this.endTimeDiff >= 30) {
-        return `is ending in ${
+        return `ends in ${
           this.endTimeDiff > 60
             ? `${Math.floor(this.endTimeDiff / 60)} hours and ${
                 this.endTimeDiff % 60 === 0

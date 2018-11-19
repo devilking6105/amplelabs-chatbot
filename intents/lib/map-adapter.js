@@ -4,11 +4,15 @@ const googleMapsClient = require("@google/maps").createClient({
 });
 
 const getMapsImageUrl = address => {
-  let url =
-    "https://maps.googleapis.com/maps/api/staticmap?zoom=18&size=600x300&maptype=roadmap&markers=color:red%7Clabel:A%7C";
+  const parsedAddress = address.replace("&", " and ");
+  let url = `https://maps.googleapis.com/maps/api/staticmap?center=${
+    address.latitude == null
+      ? parsedAddress
+      : address.latitude + "," + address.longitude
+  }&zoom=18&size=600x300&maptype=roadmap&markers=color:red%7Clabel:A%7C`;
   url +=
     address.latitude == null
-      ? address
+      ? parsedAddress
       : address.latitude + "," + address.longitude;
   return url + "&key=" + process.env.GOOGLE_MAPS_KEY;
 };
