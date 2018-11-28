@@ -916,52 +916,32 @@
     "phone_number": "416-923-8872",
     "meals": [
       {
-        "startTime": "08:45",
-        "endTime": "09:45",
-        "dayOfWeek": ["Mon", "Tue", "Wed", "Thu", "Fri"],
-        "type": "Breakfast",
-        "notes": "men only",
-        "gender": "male",
-        "age": [],
-        "race": []
-      },
-      {
-        "startTime": "08:45",
-        "endTime": "09:45",
-        "dayOfWeek": ["Sun"],
-        "type": "Breakfast",
-        "notes": "bagged, men only",
-        "gender": "male",
-        "age": [],
-        "race": []
-      },
-      {
         "startTime": "10:30",
         "endTime": "11:30",
         "dayOfWeek": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
         "type": "Lunch",
-        "notes": "available on holiday also, men only",
-        "gender": "male",
-        "age": [],
-        "race": []
-      },
-      {
-        "startTime": "11:30",
-        "endTime": "12:30",
-        "dayOfWeek": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-        "type": "Lunch",
-        "notes": "available on holiday also, men only",
+        "notes": "Everyone is welcome",
         "gender": "male",
         "age": [],
         "race": []
       },
       {
         "startTime": "16:00",
-        "endTime": "17:00",
+        "endTime": "16:30",
         "dayOfWeek": ["Mon", "Tue", "Wed", "Thu", "Fri"],
         "type": "Dinner",
-        "notes": "bagged, men only",
-        "gender": "male",
+        "notes": "bagged, at the side window of our driveway",
+        "gender": "mix",
+        "age": [],
+        "race": []
+      },
+      {
+        "startTime": "08:30",
+        "endTime": "09:00",
+        "dayOfWeek": ["Sat", "Sun"],
+        "type": "Breakfast",
+        "notes": "bagged, at the side window of our driveway",
+        "gender": "mix",
         "age": [],
         "race": []
       }
