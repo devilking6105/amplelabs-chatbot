@@ -42,7 +42,7 @@ class Meal {
   startsInText(isNow) {
     if (isNow) {
       if (this.startTimeDiff >= 0) {
-        return `is starting ${
+        return `will begin ${
           this.startTimeDiff == 0
             ? "now"
             : `in ${
@@ -56,7 +56,9 @@ class Meal {
               }`
         }`;
       } else if (this.endTimeDiff >= 30) {
-        return `is ending in ${
+        return `began at ${moment(this.startTime, "HH:mm").format(
+          "h:mm"
+        )}; it will end in ${
           this.endTimeDiff > 60
             ? `${Math.floor(this.endTimeDiff / 60)} hours and ${
                 this.endTimeDiff % 60 === 0
@@ -84,7 +86,7 @@ class Meal {
   }
 
   walkTimeText() {
-    return `about ${
+    return `approximately ${
       this.walkTime() > 60
         ? `${Math.floor(this.walkTime() / 60)} hours ${
             this.walkTime() % 60 === 0
@@ -96,7 +98,7 @@ class Meal {
   }
 
   phoneNumber() {
-    return `Please call ${this.phonenumber} to check`;
+    return `Please call ${this.phonenumber} to confirm the meal's availability`;
   }
 }
 

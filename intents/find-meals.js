@@ -136,7 +136,7 @@ class Validator {
         "Intersection",
         this.event.currentIntent.name,
         this.slots,
-        "In order to recommend a meal for you, I need your current location. ## Could you please provide me with your closest intersection, or landmark? E.g. Yonge and Dundas or King Station."
+        "In order to recommend a meal for you, I require your current location. ## Could you please provide me with your closest intersection, or landmark? E.g. Yonge and Dundas or King Station."
       );
     }
 
@@ -189,12 +189,14 @@ class Validator {
 
     if (location.isUnknown()) {
       return DialogActions.fulfill(
-        "Sorry, I'm not quite sure where that is. Is it located within Toronto?"
+        "Sorry, I'm not quite sure where that is. Is it perhaps located within Toronto?"
       );
     }
 
     if (location.isOutsideToronto()) {
-      return DialogActions.fail("Sorry, we only serve Toronto at the moment.");
+      return DialogActions.fail(
+        "My apologies, unfortunately I am only able to serve Toronto at the moment. In the future, I hope to serve other cities as well."
+      );
     }
 
     if (
@@ -230,7 +232,6 @@ class Validator {
 
 exports.validations = async (event, context, callback) => {
   try {
-    event.currentIntent.slots.MealCounter = 0;
     const validator = new Validator(event);
     let response = await validator.validate();
     callback(null, response);
@@ -248,6 +249,8 @@ function formatMeals(closestMeals) {
 }
 
 exports.fulfillment = async (event, context, callback) => {
+  if (event.currentIntent.slots.MealCounter == null)
+    event.currentIntent.slots.MealCounter = 0;
   if (event.currentIntent.slots.ShowMore === "Another time") {
     try {
       event.currentIntent.slots.Time = parseTime.getTime(
@@ -266,7 +269,17 @@ exports.fulfillment = async (event, context, callback) => {
     }
   }
 
-  const more = ["more", "yes", "yeah", "okay", "sure", "ok", "ya", "please"];
+  const more = [
+    "More",
+    "more",
+    "yes",
+    "yeah",
+    "okay",
+    "sure",
+    "ok",
+    "ya",
+    "please"
+  ];
   const now = ["now", "yes", "yeah", "ya"];
   location = await new LocationFinder(event).getLocation();
   meals = await DataLoader.meals();
@@ -334,9 +347,9 @@ exports.fulfillment = async (event, context, callback) => {
     ` ${
       event.currentIntent.slots.mealNow != null &&
       now.includes(event.currentIntent.slots.mealNow.toLowerCase())
-        ? ""
-        : `On ${moment(event.currentIntent.slots.Date).format("LL")}, `
-    } the meal ${meal.startsInText(
+        ? "The"
+        : `On ${moment(event.currentIntent.slots.Date).format("dddd")}, the`
+    } meal ${meal.startsInText(
       event.currentIntent.slots.mealNow != null &&
         now.includes(event.currentIntent.slots.mealNow.toLowerCase()) &&
         event.currentIntent.slots.AltResult == null
@@ -344,14 +357,14 @@ exports.fulfillment = async (event, context, callback) => {
         : false
     )}. ## ${
       meal.notes === "na"
-        ? "The agency serves everyone."
-        : `The agency serves people who are: <b>${meal.notes}.</b>`
+        ? "This agency serves everyone."
+        : `This agency serves people who are: <b>${meal.notes}.</b>`
     }` +
     ` Please call <a href="tel:${meal.phonenumber.substring(0, 12)}">${
       meal.phonenumber
     }</a> if you require more information.`;
 
-  if (event.currentIntent.slots.ShowMore === "time") {
+  if (event.currentIntent.slots.ShowMore === "Time") {
     event.currentIntent.slots.MealCounter = 0;
     event.currentIntent.slots.Time = null;
     event.currentIntent.slots.ShowMore = null;
