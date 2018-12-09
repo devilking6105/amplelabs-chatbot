@@ -67,6 +67,14 @@ class DialogActions {
     content,
     mealAddress
   ) {
+    let directionsMap = `https://www.google.com/maps/dir/?api=1&origin=${
+      slots.useGPS === "Yes" &&
+      slots.Latitude != null &&
+      slots.Longitude != null
+        ? `${slots.Latitude},${slots.Longitude}`
+        : `${slots.Intersection.replace("&", " and ")}%20Toronto`
+    }&destination=${mealAddress}&travelmode=walking`;
+
     return {
       sessionAttributes,
       dialogAction: {
@@ -89,12 +97,7 @@ class DialogActions {
               title: "Directions",
               subTitle: "Directions",
               imageUrl: MapsAdapter.mapsUrl(mealAddress),
-              attachmentLinkUrl:
-                "https://www.google.com/maps/dir/?api=1&origin=" +
-                slots.Intersection +
-                "%20Toronto&destination=" +
-                mealAddress +
-                "&travelmode=walking"
+              attachmentLinkUrl: directionsMap
             }
           ]
         },
