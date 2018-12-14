@@ -360,9 +360,13 @@ exports.fulfillment = async (event, context, callback) => {
         ? "This agency serves everyone."
         : `This agency serves people who are: <b>${meal.notes}.</b>`
     }` +
-    ` Please call <a href="tel:${meal.phonenumber.substring(0, 12)}">${
-      meal.phonenumber
-    }</a> if you require more information.`;
+    `${
+      meal.phonenumber === "na"
+        ? ""
+        : ` Please call <a href="tel:${meal.phonenumber.substring(0, 12)}">${
+            meal.phonenumber
+          }</a> if you require more information.`
+    }`;
 
   if (event.currentIntent.slots.ShowMore === "Time") {
     event.currentIntent.slots.MealCounter = 0;
