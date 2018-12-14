@@ -67,12 +67,16 @@ class DialogActions {
     content,
     mealAddress
   ) {
+    let intersection =
+      slots.Intersection == null
+        ? null
+        : slots.Intersection.replace("&", " and ");
     let directionsMap = `https://www.google.com/maps/dir/?api=1&origin=${
       slots.useGPS === "Yes" &&
       slots.Latitude != null &&
       slots.Longitude != null
         ? `${slots.Latitude},${slots.Longitude}`
-        : `${slots.Intersection.replace("&", " and ")}%20Toronto`
+        : `${intersection}%20Toronto`
     }&destination=${mealAddress}&travelmode=walking`;
 
     return {
