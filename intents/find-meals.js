@@ -180,7 +180,6 @@ class Validator {
   }
 
   validateLocation(location) {
-    console.log(`The location is ${location.address}`);
     if (location.address === "Toronto, ON, Canada") {
       this.event.currentIntent.confirmationStatus = "Confirmed";
       this.slots.Confirmed = true;
@@ -256,6 +255,7 @@ exports.fulfillment = async (event, context, callback) => {
       event.currentIntent.slots.Time = parseTime.getTime(
         event.inputTranscript
       ).miliTime;
+      event.currentIntent.slots.Date = event.inputTranscript;
     } catch (e) {}
 
     if (event.currentIntent.slots.Time == null) {
@@ -267,6 +267,60 @@ exports.fulfillment = async (event, context, callback) => {
         "Sorry, I couldn't understand. What time did you want to eat at?"
       );
     }
+  }
+
+  if (
+    event.currentIntent.slots.ShowMore === "result" ||
+    event.currentIntent.slots.ShowMore === "Result"
+  ) {
+    event.currentIntent.slots.Age = null;
+    event.currentIntent.slots.Gender = null;
+    event.currentIntent.slots.ShowMore = null;
+    event.currentIntent.slots.AltResult = null;
+    event.currentIntent.slots.Date = moment().format("YYYY-MM-DD");
+    event.currentIntent.slots.mealNow = "now";
+    return DialogActions.buttonElicitSlot(
+      event.sessionAttributes,
+      "Eligibility",
+      event.currentIntent.name,
+      event.currentIntent.slots,
+      "Would you like to see age/gender specific options?",
+      null,
+      ["Yes", "No"],
+      ["Yes", "No"]
+    );
+  }
+
+  if (
+    event.currentIntent.slots.Eligibility === "Yes" &&
+    event.currentIntent.slots.Age == null &&
+    event.currentIntent.slots.Gender !== "mix"
+  ) {
+    event.currentIntent.slots.ShowMore = null;
+    event.currentIntent.slots.MealCounter = 0;
+    return DialogActions.elicitSlot(
+      event.sessionAttributes,
+      "Age",
+      event.currentIntent.name,
+      event.currentIntent.slots,
+      "What is your age?"
+    );
+  } else if (
+    event.currentIntent.slots.Eligibility === "Yes" &&
+    event.currentIntent.slots.Gender == null
+  ) {
+    return DialogActions.buttonElicitSlot(
+      event.sessionAttributes,
+      "Gender",
+      event.currentIntent.name,
+      event.currentIntent.slots,
+      "To which gender identity do you most identify?",
+      null,
+      ["Male", "Female", "LGBTQ", "Skip"],
+      ["male", "female", "LGBTQ", "mix"]
+    );
+  } else if (event.currentIntent.slots.Eligibility === "No") {
+    event.currentIntent.slots.ShowMore = null;
   }
 
   const more = [
@@ -323,12 +377,40 @@ exports.fulfillment = async (event, context, callback) => {
 
   meal = closestMeals[event.currentIntent.slots.MealCounter];
 
+  if (
+    meal == null &&
+    event.currentIntent.slots.Eligibility === "Yes" &&
+    event.currentIntent.slots.Gender !== "mix"
+  ) {
+    event.currentIntent.slots.Gender = "mix";
+    event.currentIntent.slots.Age = null;
+    event.currentIntent.slots.MealCounter = 0;
+    mealFinder = new MealFinder(
+      meals,
+      location,
+      moment(event.currentIntent.slots.Date).format("ddd"),
+      event.currentIntent.slots.Time,
+      event.currentIntent.slots.Age,
+      event.currentIntent.slots.Gender
+    );
+    closestMeals = await mealFinder.find();
+    meal = closestMeals[event.currentIntent.slots.MealCounter];
+  }
+
   if (meal == null) {
     return DialogActions.fulfill(
       `Those were all of the meals which I could find for today. ## Please contact <a href="tel:211">2-1-1</a> by phone, if you still require assistance in finding a meal. ## Is there anything else that I can help you with today?`
     );
   }
+
   mealString =
+    `${
+      event.currentIntent.slots.Eligibility === "Yes" &&
+      event.currentIntent.slots.Gender === "mix" &&
+      event.currentIntent.slots.MealCounter === 0
+        ? "I couldn't find any meals available with given eligibility criteria. "
+        : ""
+    }` +
     `${
       event.currentIntent.slots.Intersection === "default" &&
       event.currentIntent.slots.MealCounter == 0
@@ -356,12 +438,12 @@ exports.fulfillment = async (event, context, callback) => {
         ? true
         : false
     )}. ## ${
-      meal.notes === "na"
+      meal.notes === "na" || meal.notes === ""
         ? "This agency serves everyone."
         : `This agency serves people who are: <b>${meal.notes}.</b>`
     }` +
     `${
-      meal.phonenumber === "na"
+      meal.phonenumber === "na" || meal.phonenumber === ""
         ? ""
         : ` Please call <a href="tel:${meal.phonenumber.substring(0, 12)}">${
             meal.phonenumber

@@ -24,6 +24,7 @@ class Meal {
     this.race = m.race;
     this.distance = m.distance;
     this.phonenumber = m.phone_number;
+    this.resourceId = m.resourceId == null ? null : m.resourceId;
   }
 
   addDistanceFrom(location) {
@@ -77,28 +78,6 @@ class Meal {
         start >= "12:00" ? startText + " pm" : startText + " am"
       } to ${end >= "12:00" ? endText + " pm" : endText + " am"}`;
     }
-  }
-
-  walkTime() {
-    const avgWalkingSpeed = 1.1; // m/sec (see google)
-    const magicNumber = 0.7747234935;
-    return Math.ceil(((this.distance * avgWalkingSpeed) / 60.0) * magicNumber);
-  }
-
-  walkTimeText() {
-    return `approximately ${
-      this.walkTime() > 60
-        ? `${Math.floor(this.walkTime() / 60)} hours ${
-            this.walkTime() % 60 === 0
-              ? ``
-              : ` and ${this.walkTime() % 60} minutes`
-          }`
-        : `${this.walkTime()} minutes`
-    }`;
-  }
-
-  phoneNumber() {
-    return `Please call ${this.phonenumber} to confirm the meal's availability`;
   }
 }
 

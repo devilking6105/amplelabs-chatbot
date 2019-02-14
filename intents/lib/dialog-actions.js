@@ -96,7 +96,8 @@ class DialogActions {
               buttons: [
                 { text: "Show me more", value: "more" },
                 { text: "Another time", value: "time" },
-                { text: "This is fine", value: "fine" }
+                { text: "This is fine", value: "fine" },
+                { text: "Filter result", value: "result" }
               ],
               title: "Directions",
               subTitle: "Directions",
