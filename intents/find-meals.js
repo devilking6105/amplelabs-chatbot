@@ -115,7 +115,7 @@ class Validator {
         "useGPS",
         this.event.currentIntent.name,
         this.slots,
-        "Can I use your current location?",
+        "May I use your current location?",
         null,
         ["Yes", "No"],
         ["Yes", "No"]
@@ -136,7 +136,7 @@ class Validator {
         "Intersection",
         this.event.currentIntent.name,
         this.slots,
-        "I need a location to recommend a meal for you. ## Can you give me a intersection or landmark? E.g. Yonge and Dundas or King Station."
+        "In order to recommend a meal for you, I require your current location. ## Could you please provide me with your closest intersection, or landmark? E.g. Yonge and Dundas or King Station."
       );
     }
 
@@ -166,7 +166,7 @@ class Validator {
         "Intersection",
         this.event.currentIntent.name,
         this.slots,
-        "Unfortunately, I couldn't locate your GPS. ## Can you give me a intersection or landmark? E.g. Yonge and Dundas or King Station."
+        "Unfortunately, I could not access your location through your GPS. ## Could you please provide me with your closest intersection, or landmark? E.g. Yonge and Dundas or King Station."
       );
     }
 
@@ -180,7 +180,6 @@ class Validator {
   }
 
   validateLocation(location) {
-    console.log(`The location is ${location.address}`);
     if (location.address === "Toronto, ON, Canada") {
       this.event.currentIntent.confirmationStatus = "Confirmed";
       this.slots.Confirmed = true;
@@ -189,13 +188,13 @@ class Validator {
 
     if (location.isUnknown()) {
       return DialogActions.fulfill(
-        "I am sorry, I do not know where that is. Is it in Toronto?"
+        "Sorry, I'm not quite sure where that is. Is it perhaps located within Toronto?"
       );
     }
 
     if (location.isOutsideToronto()) {
       return DialogActions.fail(
-        "Sorry, we are only serving Toronto at the moment."
+        "My apologies, unfortunately I am only able to serve Toronto at the moment. In the future, I hope to serve other cities as well."
       );
     }
 
@@ -218,7 +217,7 @@ class Validator {
         "Intersection",
         this.event.currentIntent.name,
         { ...this.slots },
-        "Let's try again. Can you give me an intersection, or landmark? E.g. Yonge and Dundas or King Station"
+        "Hmm.. let's try again. Could you please provide me with your closest intersection, or landmark? E.g. Yonge and Dundas or King Station."
       );
     } else {
       this.slots.Confirmed = "true";
@@ -232,7 +231,6 @@ class Validator {
 
 exports.validations = async (event, context, callback) => {
   try {
-    event.currentIntent.slots.MealCounter = 0;
     const validator = new Validator(event);
     let response = await validator.validate();
     callback(null, response);
@@ -250,11 +248,14 @@ function formatMeals(closestMeals) {
 }
 
 exports.fulfillment = async (event, context, callback) => {
+  if (event.currentIntent.slots.MealCounter == null)
+    event.currentIntent.slots.MealCounter = 0;
   if (event.currentIntent.slots.ShowMore === "Another time") {
     try {
       event.currentIntent.slots.Time = parseTime.getTime(
         event.inputTranscript
       ).miliTime;
+      event.currentIntent.slots.Date = event.inputTranscript;
     } catch (e) {}
 
     if (event.currentIntent.slots.Time == null) {
@@ -263,12 +264,76 @@ exports.fulfillment = async (event, context, callback) => {
         "Time",
         event.currentIntent.name,
         event.currentIntent.slots,
-        "I couldn't catch time for meals, what time do you want to eat at?"
+        "Sorry, I couldn't understand. What time did you want to eat at?"
       );
     }
   }
 
-  const more = ["more", "yes", "yeah", "okay", "sure", "ok", "ya", "please"];
+  if (
+    event.currentIntent.slots.ShowMore === "result" ||
+    event.currentIntent.slots.ShowMore === "Result"
+  ) {
+    event.currentIntent.slots.Age = null;
+    event.currentIntent.slots.Gender = null;
+    event.currentIntent.slots.ShowMore = null;
+    event.currentIntent.slots.AltResult = null;
+    event.currentIntent.slots.Date = moment().format("YYYY-MM-DD");
+    event.currentIntent.slots.mealNow = "now";
+    return DialogActions.buttonElicitSlot(
+      event.sessionAttributes,
+      "Eligibility",
+      event.currentIntent.name,
+      event.currentIntent.slots,
+      "Would you like to see age/gender specific options?",
+      null,
+      ["Yes", "No"],
+      ["Yes", "No"]
+    );
+  }
+
+  if (
+    event.currentIntent.slots.Eligibility === "Yes" &&
+    event.currentIntent.slots.Age == null &&
+    event.currentIntent.slots.Gender !== "mix"
+  ) {
+    event.currentIntent.slots.ShowMore = null;
+    event.currentIntent.slots.MealCounter = 0;
+    return DialogActions.elicitSlot(
+      event.sessionAttributes,
+      "Age",
+      event.currentIntent.name,
+      event.currentIntent.slots,
+      "What is your age?"
+    );
+  } else if (
+    event.currentIntent.slots.Eligibility === "Yes" &&
+    event.currentIntent.slots.Gender == null
+  ) {
+    return DialogActions.buttonElicitSlot(
+      event.sessionAttributes,
+      "Gender",
+      event.currentIntent.name,
+      event.currentIntent.slots,
+      "To which gender identity do you most identify?",
+      null,
+      ["Male", "Female", "LGBTQ", "Skip"],
+      ["male", "female", "LGBTQ", "mix"]
+    );
+  } else if (event.currentIntent.slots.Eligibility === "No") {
+    event.currentIntent.slots.ShowMore = null;
+  }
+
+  const more = [
+    "More",
+    "more",
+    "yes",
+    "yeah",
+    "okay",
+    "sure",
+    "ok",
+    "ya",
+    "please"
+  ];
   const now = ["now", "yes", "yeah", "ya"];
   location = await new LocationFinder(event).getLocation();
   meals = await DataLoader.meals();
@@ -312,48 +377,80 @@ exports.fulfillment = async (event, context, callback) => {
 
   meal = closestMeals[event.currentIntent.slots.MealCounter];
 
+  if (
+    meal == null &&
+    event.currentIntent.slots.Eligibility === "Yes" &&
+    event.currentIntent.slots.Gender !== "mix"
+  ) {
+    event.currentIntent.slots.Gender = "mix";
+    event.currentIntent.slots.Age = null;
+    event.currentIntent.slots.MealCounter = 0;
+    mealFinder = new MealFinder(
+      meals,
+      location,
+      moment(event.currentIntent.slots.Date).format("ddd"),
+      event.currentIntent.slots.Time,
+      event.currentIntent.slots.Age,
+      event.currentIntent.slots.Gender
+    );
+    closestMeals = await mealFinder.find();
+    meal = closestMeals[event.currentIntent.slots.MealCounter];
+  }
+
   if (meal == null) {
     return DialogActions.fulfill(
-      `That's all meals I could find for the day. ## Please contact <a href="tel:211">2-1-1</a> by phone if you still need help finding a meal. ## Can I help you with anything else?`
+      `Those were all of the meals which I could find for today. ## Please contact <a href="tel:211">2-1-1</a> by phone, if you still require assistance in finding a meal. ## Is there anything else that I can help you with today?`
     );
   }
+
   mealString =
+    `${
+      event.currentIntent.slots.Eligibility === "Yes" &&
+      event.currentIntent.slots.Gender === "mix" &&
+      event.currentIntent.slots.MealCounter === 0
+        ? "I couldn't find any meals available with given eligibility criteria. "
+        : ""
+    }` +
     `${
       event.currentIntent.slots.Intersection === "default" &&
       event.currentIntent.slots.MealCounter == 0
-        ? "Here are meals available in Toronto. ## "
+        ? "Here are meals currently available in Toronto. ## "
         : ""
     }` +
     `${
       event.currentIntent.slots.AltResult === "yes" &&
       event.currentIntent.slots.MealCounter == 0
-        ? "There's no more meals available today. Here's next available meal. ## "
+        ? "There are no more meals available today. Here is next available meal. ## "
         : ""
     }` +
-    `A free meal closest to you is at ${meal.organizationName} at ${
+    `The next free meal closest to you is at ${meal.organizationName} at ${
       meal.address
     }. ## ` +
     ` ${
       event.currentIntent.slots.mealNow != null &&
       now.includes(event.currentIntent.slots.mealNow.toLowerCase())
-        ? ""
-        : `On ${moment(event.currentIntent.slots.Date).format("LL")}, `
-    } The meal ${meal.startsInText(
+        ? "The"
+        : `On ${moment(event.currentIntent.slots.Date).format("dddd")}, the`
+    } meal ${meal.startsInText(
       event.currentIntent.slots.mealNow != null &&
         now.includes(event.currentIntent.slots.mealNow.toLowerCase()) &&
         event.currentIntent.slots.AltResult == null
         ? true
         : false
     )}. ## ${
-      meal.notes === "na"
-        ? "The agency serves for everyone."
-        : `The agency serves people that are: <b>${meal.notes}.</b>`
+      meal.notes === "na" || meal.notes === ""
+        ? "This agency serves everyone."
+        : `This agency serves people who are: <b>${meal.notes}.</b>`
     }` +
-    ` You can call <a href="tel:${meal.phonenumber.substring(0, 12)}">${
-      meal.phonenumber
-    }</a> to find out more information.`;
+    `${
+      meal.phonenumber === "na" || meal.phonenumber === ""
+        ? ""
+        : ` Please call <a href="tel:${meal.phonenumber.substring(0, 12)}">${
+            meal.phonenumber
+          }</a> if you require more information.`
+    }`;
 
-  if (event.currentIntent.slots.ShowMore === "time") {
+  if (event.currentIntent.slots.ShowMore === "Time") {
     event.currentIntent.slots.MealCounter = 0;
     event.currentIntent.slots.Time = null;
     event.currentIntent.slots.ShowMore = null;
@@ -364,7 +461,7 @@ exports.fulfillment = async (event, context, callback) => {
       "Date",
       event.currentIntent.name,
       event.currentIntent.slots,
-      "Okay, I can help you look for something at a different time. What time are you looking for? E.g. Tomorrow at 1pm"
+      "Sure, I can help you look for something that's at a different time. What time were looking for? E.g. Tomorrow at 1pm"
     );
   }
 
@@ -401,7 +498,7 @@ exports.fulfillment = async (event, context, callback) => {
           Feedback: event.inputTranscript,
           Restart: null
         },
-        "Great! Glad I could help! ## Do you have any feedback for me or suggestions of things I should learn?"
+        "That's great! I'm so pleased that I could be of assistance to you today. ## Do you have any feedback for me, or suggestions of things that I should learn?"
       );
     }
     callback(null, DialogActions.fulfill("Perfect!"));
