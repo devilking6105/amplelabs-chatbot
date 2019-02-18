@@ -138,10 +138,10 @@ class MealFinder {
       }
       // parameter to tune
       const a = 1
-      const b = 0
+      const b = 1
       return this.mealsInTime.sort((x, y) =>
-        a*(diffTime(this.time, x.startTime) + b*x.distance) < 
-        a*(diffTime(this.time, y.startTime) + b*y.distance) ? -1 : 1
+        (a*diffTime(this.time, x.startTime) + (b*x.distance)) < 
+        (a*diffTime(this.time, y.startTime) + (b*y.distance)) ? -1 : 1
       );
     } else {
       return this.mealsInTime;
