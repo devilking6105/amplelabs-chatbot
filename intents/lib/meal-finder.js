@@ -1,4 +1,6 @@
 const request = require("request");
+const moment = require("moment");
+
 class MealFinder {
   constructor(meals, location, date, time, age, gender) {
     this.meals = meals;
@@ -127,8 +129,19 @@ class MealFinder {
         this.mealsInTime.splice(removeIndex[i] - adjustCounter, 1);
         adjustCounter++;
       }
+
+      const diffTime= (t1, t2) => {
+        const t1m = moment().hour(t1.split(':')[0]).minute(t1.split(':')[1])
+        const t2m = moment().hour(t2.split(':')[0]).minute(t2.split(':')[1])
+        // console.log(Math.abs(t1m.diff(t2m)))
+        return Math.abs(t1m.diff(t2m))
+      }
+      // parameter to tune
+      const a = 1
+      const b = 0
       return this.mealsInTime.sort((x, y) =>
-        x.startTime < y.startTime ? -1 : 1
+        a*(diffTime(this.time, x.startTime) + b*x.distance) < 
+        a*(diffTime(this.time, y.startTime) + b*y.distance) ? -1 : 1
       );
     } else {
       return this.mealsInTime;
