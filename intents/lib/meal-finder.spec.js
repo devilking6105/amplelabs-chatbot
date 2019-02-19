@@ -1,5 +1,55 @@
-// This file is out datad
-// I don't think meal.js test is needed
+const moment = require("moment");
+const dataLoader = require('../lib/data-loader')
+const Location = require('./location')
+const MealFinder = require('./meal-finder')
+
+
+// const coords = (latitude, longitude) => {
+//   return {latitude, longitude, city: 'Toronto'}
+// }
+
+
+describe('MealFinder', async () => {
+  it(
+    `Given a address of a service provider,
+    it should return the same meal record of the service provider.`,
+    async () => {
+      // Ref: "resourceId": "35196-2",
+      const meals = await dataLoader.meals() // why dataloader returns a promise?
+      const closestMeal = meals.find(m => m.resourceId === '35196-2')
+      const location = await Location.fromAddress(closestMeal.address)
+      const time = moment()
+        .day(closestMeal.dayOfWeek[0])
+        .hour(closestMeal.startTime.split(':')[0])
+        .minute(closestMeal.startTime.split(':')[1])
+      const age = 19
+      const gender = 'mix'
+      const mealFinder = new MealFinder(meals, location, time, age, gender)
+      const result = await mealFinder.find()
+      
+      console.log(result)
+      
+      // const location = await Location.fromCoords(coords(43.652088, -79.385525))
+      // const closestMeal = new Meal(coords(43.652088, -79.385525))
+      //console.log(location)
+      expect(true).toEqual(true)
+  })
+  // it('finds the closest meal', async () => {
+  //   // Ref: "resourceId": "35196-2",
+  //   const location = await Location.fromCoords(coords(43.652088, -79.385525))
+
+  //   const closestMeal = new Meal(coords(43.652088, -79.385525))
+  //   const fartherMeal = new Meal(coords(43.752088, -79.485525)) // make up gps
+  //   const meals = [fartherMeal, closestMeal]
+
+  //   const mealFinder = new MealFinder(meals, location)
+  //   console.log(mealFinder.find)
+  //   console.log(closestMeal)
+
+  //   expect(mealFinder.find(1)).toEqual([closestMeal])
+  // })
+})
+
 
 /*
 const Meal = require('./meal')

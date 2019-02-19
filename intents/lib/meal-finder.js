@@ -138,7 +138,7 @@ class MealFinder {
       }
       // parameter to tune
       const a = 1
-      const b = 1
+      const b = 10000000000 // the magnitude between time and space is huge!!
       return this.mealsInTime.sort((x, y) =>
         (a*diffTime(this.time, x.startTime) + (b*x.distance)) < 
         (a*diffTime(this.time, y.startTime) + (b*y.distance)) ? -1 : 1

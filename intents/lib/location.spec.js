@@ -21,9 +21,12 @@ describe('Location', () => {
     // same gps coord could resolve into different but nearby
     // addresses
     const newCorrds = await Location.fromAddress(location.address)
+    const numberOfDigitsToCompare = 4
+    coords.longitude = coords.longitude.toFixed(numberOfDigitsToCompare)
+    coords.latitude = coords.latitude.toFixed(numberOfDigitsToCompare)
     expect(coords).toEqual({
-      longitude: newCorrds.longitude,
-      latitude: newCorrds.latitude
+      longitude: newCorrds.longitude.toFixed(numberOfDigitsToCompare),
+      latitude: newCorrds.latitude.toFixed(numberOfDigitsToCompare)
     })
   })
 

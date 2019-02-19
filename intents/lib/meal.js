@@ -29,6 +29,7 @@ class Meal {
 
   addDistanceFrom(location) {
     this.location = location;
+    const tmp = haversine(location, this, { unit: "meter" })
     this.distance = haversine(location, this, { unit: "meter" });
   }
 
