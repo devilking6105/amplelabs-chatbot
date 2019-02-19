@@ -8,6 +8,7 @@ class MealFinder {
     this.gender = gender;
     this.age = age;
     this.mealsInTime = [];
+    this.mealsLaterTime = [];
 
     if (gender == "Female") {
       this.gender = "female";
@@ -88,14 +89,22 @@ class MealFinder {
       meal.addTimeDiff(this.time);
       if (meal.age[0] != null && meal.age[1] != null) {
         if (
-          (meal.startTimeDiff >= 0 ||
-            (meal.startTime < this.time && this.time < meal.endTime)) &&
+          meal.startTime <= this.time &&
+          this.time < meal.endTime &&
           meal.gender === this.gender &&
           meal.dayOfWeek.includes(this.date) &&
           this.confirmAge(this.age, meal.age)
         ) {
           meal.addDistanceFrom(this.location);
           this.mealsInTime.push(meal);
+        } else if (
+          meal.startTime > this.time &&
+          this.gender === this.gender &&
+          meal.dayOfWeek.includes(this.date) &&
+          this.confirmAge(this.age, meal.age)
+        ) {
+          meal.addDistanceFrom(this.location);
+          this.mealsLaterTime.push(meal);
         }
       } else {
         if (
@@ -106,6 +115,13 @@ class MealFinder {
         ) {
           meal.addDistanceFrom(this.location);
           this.mealsInTime.push(meal);
+        } else if (
+          meal.startTime > this.time &&
+          meal.gender === this.gender &&
+          meal.dayOfWeek.includes(this.date)
+        ) {
+          meal.addDistanceFrom(this.location);
+          this.mealsLaterTime.push(meal);
         }
       }
     });
@@ -127,10 +143,16 @@ class MealFinder {
         this.mealsInTime.splice(removeIndex[i] - adjustCounter, 1);
         adjustCounter++;
       }
-      return this.mealsInTime.sort((x, y) =>
-        x.startTime < y.startTime ? -1 : 1
-      );
+      this.mealsInTime.sort((x, y) => (x.distance < y.distance ? -1 : 1));
+      if (this.mealsLaterTime > 0) {
+        this.mealsLaterTime.sort((x, y) =>
+          x.startTime < y.startTime ? -1 : 1
+        );
+      }
+      this.mealsInTime.push(...this.mealsLaterTime);
+      return this.mealsInTime;
     } else {
+      this.mealsInTime.push(...this.mealsLaterTime);
       return this.mealsInTime;
     }
   }
