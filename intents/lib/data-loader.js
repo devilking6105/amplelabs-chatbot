@@ -1,5 +1,4 @@
-// const mealInfoFile = require("../../data/meal.json");
-const mealInfoFile = require("../../data/mock-meals-50.json");
+const mealInfoFile = require("../../data/meal.json");
 const Meal = require("./meal");
 
 module.exports = {

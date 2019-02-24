@@ -3,6 +3,8 @@ const dataLoader = require('../lib/data-loader')
 const Location = require('./location')
 const MealFinder = require('./meal-finder')
 
+const mealInfoFile = require("../../data/mock-meals-50.json");
+
 
 // const coords = (latitude, longitude) => {
 //   return {latitude, longitude, city: 'Toronto'}
@@ -14,25 +16,31 @@ describe('MealFinder', async () => {
     `Given a address of a service provider,
     it should return the same meal record of the service provider.`,
     async () => {
-      // Ref: "resourceId": "35196-2",
-      const meals = await dataLoader.meals() // why dataloader returns a promise?
-      const closestMeal = meals.find(m => m.resourceId === '35196-2')
+      const meals = await dataLoader.meals(mealInfoFile) // why dataloader returns a promise?
+      const correctResId = '35196-2'
+      const closestMeal = meals.find(m => m.resourceId === correctResId)
       const location = await Location.fromAddress(closestMeal.address)
-      const time = moment()
+      const datetime = moment()
         .day(closestMeal.dayOfWeek[0])
         .hour(closestMeal.startTime.split(':')[0])
         .minute(closestMeal.startTime.split(':')[1])
       const age = 19
       const gender = 'mix'
-      const mealFinder = new MealFinder(meals, location, time, age, gender)
+    
+      // console.log(`ask meal time at time: ${datetime.format()}`)
+    
+      const mealFinder = new MealFinder(
+        meals, 
+        location, 
+        datetime.format("ddd").toLowerCase(), 
+        datetime.format("HH:mm"), 
+        age, 
+        gender)
       const result = await mealFinder.find()
-      
-      console.log(result)
-      
       // const location = await Location.fromCoords(coords(43.652088, -79.385525))
       // const closestMeal = new Meal(coords(43.652088, -79.385525))
       //console.log(location)
-      expect(true).toEqual(true)
+      expect(result[0].resourceId).toEqual(correctResId)
   })
   // it('finds the closest meal', async () => {
   //   // Ref: "resourceId": "35196-2",

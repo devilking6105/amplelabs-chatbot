@@ -5,10 +5,12 @@ const dataLoader = require('./intents/lib/data-loader')
 const Location = require('./intents/lib/location')
 const MealFinder = require('./intents/lib/meal-finder')
 
+const mealInfoFile = require("./data/mock-meals-50.json");
+
 const main = async () => {
   // Ref: "resourceId": "35196-2",
-  const meals = await dataLoader.meals() // why dataloader returns a promise?
-  const closestMeal = meals.find(m => m.resourceId === '35280-2') // '35196-2')
+  const meals = await dataLoader.meals(mealInfoFile) // why dataloader returns a promise?
+  const closestMeal = meals.find(m => m.resourceId === '35196-2')
   const location = await Location.fromAddress(closestMeal.address)
   const datetime = moment()
     .day(closestMeal.dayOfWeek[0])
