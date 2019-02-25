@@ -10,6 +10,7 @@ class MealFinder {
     this.gender = gender;
     this.age = age;
     this.mealsInTime = [];
+    this.mealsLaterTime = [];
 
     if (gender == "Female") {
       this.gender = "female";
@@ -90,14 +91,22 @@ class MealFinder {
       meal.addTimeDiff(this.time);
       if (meal.age[0] != null && meal.age[1] != null) {
         if (
-          (meal.startTimeDiff >= 0 ||
-            (meal.startTime < this.time && this.time < meal.endTime)) &&
+          meal.startTime <= this.time &&
+          this.time < meal.endTime &&
           meal.gender === this.gender &&
           meal.dayOfWeek.includes(this.date) &&
           this.confirmAge(this.age, meal.age)
         ) {
           meal.addDistanceFrom(this.location);
           this.mealsInTime.push(meal);
+        } else if (
+          meal.startTime > this.time &&
+          this.gender === this.gender &&
+          meal.dayOfWeek.includes(this.date) &&
+          this.confirmAge(this.age, meal.age)
+        ) {
+          meal.addDistanceFrom(this.location);
+          this.mealsLaterTime.push(meal);
         }
       } else {
         if (
@@ -108,6 +117,13 @@ class MealFinder {
         ) {
           meal.addDistanceFrom(this.location);
           this.mealsInTime.push(meal);
+        } else if (
+          meal.startTime > this.time &&
+          meal.gender === this.gender &&
+          meal.dayOfWeek.includes(this.date)
+        ) {
+          meal.addDistanceFrom(this.location);
+          this.mealsLaterTime.push(meal);
         }
       }
     });
@@ -129,21 +145,16 @@ class MealFinder {
         this.mealsInTime.splice(removeIndex[i] - adjustCounter, 1);
         adjustCounter++;
       }
-
-      const diffTime= (t1, t2) => {
-        const t1m = moment().hour(t1.split(':')[0]).minute(t1.split(':')[1])
-        const t2m = moment().hour(t2.split(':')[0]).minute(t2.split(':')[1])
-        // console.log(Math.abs(t1m.diff(t2m)))
-        return Math.abs(t1m.diff(t2m))
+      this.mealsInTime.sort((x, y) => (x.distance < y.distance ? -1 : 1));
+      if (this.mealsLaterTime > 0) {
+        this.mealsLaterTime.sort((x, y) =>
+          x.startTime < y.startTime ? -1 : 1
+        );
       }
-      // parameter to tune
-      const a = 1
-      const b = 1
-      return this.mealsInTime.sort((x, y) =>
-        (a*diffTime(this.time, x.startTime) + (b*x.distance)) < 
-        (a*diffTime(this.time, y.startTime) + (b*y.distance)) ? -1 : 1
-      );
+      this.mealsInTime.push(...this.mealsLaterTime);
+      return this.mealsInTime;
     } else {
+      this.mealsInTime.push(...this.mealsLaterTime);
       return this.mealsInTime;
     }
   }

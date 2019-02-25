@@ -1,5 +1,63 @@
-// This file is out datad
-// I don't think meal.js test is needed
+const moment = require("moment");
+const dataLoader = require('../lib/data-loader')
+const Location = require('./location')
+const MealFinder = require('./meal-finder')
+
+const mealInfoFile = require("../../data/mock-meals-50.json");
+
+
+// const coords = (latitude, longitude) => {
+//   return {latitude, longitude, city: 'Toronto'}
+// }
+
+
+describe('MealFinder', async () => {
+  it(
+    `Given a address of a service provider,
+    it should return the same meal record of the service provider.`,
+    async () => {
+      const meals = await dataLoader.meals(mealInfoFile) // why dataloader returns a promise?
+      const correctResId = '35196-2'
+      const closestMeal = meals.find(m => m.resourceId === correctResId)
+      const location = await Location.fromAddress(closestMeal.address)
+      const datetime = moment()
+        .day(closestMeal.dayOfWeek[0])
+        .hour(closestMeal.startTime.split(':')[0])
+        .minute(closestMeal.startTime.split(':')[1])
+      const age = 19
+      const gender = 'mix'
+    
+      // console.log(`ask meal time at time: ${datetime.format()}`)
+    
+      const mealFinder = new MealFinder(
+        meals, 
+        location, 
+        datetime.format("ddd").toLowerCase(), 
+        datetime.format("HH:mm"), 
+        age, 
+        gender)
+      const result = await mealFinder.find()
+      // const location = await Location.fromCoords(coords(43.652088, -79.385525))
+      // const closestMeal = new Meal(coords(43.652088, -79.385525))
+      //console.log(location)
+      expect(result[0].resourceId).toEqual(correctResId)
+  })
+  // it('finds the closest meal', async () => {
+  //   // Ref: "resourceId": "35196-2",
+  //   const location = await Location.fromCoords(coords(43.652088, -79.385525))
+
+  //   const closestMeal = new Meal(coords(43.652088, -79.385525))
+  //   const fartherMeal = new Meal(coords(43.752088, -79.485525)) // make up gps
+  //   const meals = [fartherMeal, closestMeal]
+
+  //   const mealFinder = new MealFinder(meals, location)
+  //   console.log(mealFinder.find)
+  //   console.log(closestMeal)
+
+  //   expect(mealFinder.find(1)).toEqual([closestMeal])
+  // })
+})
+
 
 /*
 const Meal = require('./meal')
