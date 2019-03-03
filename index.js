@@ -8,16 +8,14 @@ const MealFinder = require('./intents/lib/meal-finder')
 const mealInfoFile = require("./data/mock-meals-50.json");
 
 const main = async () => {
-  // Ref: "resourceId": "35196-2",
-  const meals = await dataLoader.meals(mealInfoFile) // why dataloader returns a promise?
-  const closestMeal = meals.find(m => m.resourceId === '35196-2')
-  const location = await Location.fromAddress(closestMeal.address)
+  const meals = await dataLoader.meals(mealInfoFile)
+  const location = await Location.fromAddress('king station')
   const datetime = moment()
-    .day(closestMeal.dayOfWeek[0])
-    .hour(closestMeal.startTime.split(':')[0])
-    .minute(closestMeal.startTime.split(':')[1])
-  const age = 19
-  const gender = 'mix'
+    .day('tue')
+    .hour('11')
+    .minute('00')
+  const age = 16
+  const gender = 'mix' // 'female', 'male', 'other' or 'mix'
 
   console.log(`ask meal time at time: ${datetime.format()}`)
 
@@ -30,7 +28,9 @@ const main = async () => {
     gender)
   const result = await mealFinder.find()
   
-  console.log(result.map(x => `id: ${x.resourceId} | time: ${datetime.format("HH:mm")} | start time: ${x.startTime} | dist: ${x.distance}`))
+  console.log(`Meal asked at: ${datetime} at location: ${location.address}`)
+  console.log(`Age Requesed: ${age === '' ? 'n/a' : age }, Gender requested: ${gender}`)
+  console.log(result.map(x => `id: ${x.resourceId} | time: ${datetime.format("HH:mm")} | start time: ${x.startTime} | dist: ${x.distance} | age range: ${JSON.stringify(x.age)} | gender: ${x.gender} | weekday open: ${x.dayOfWeek}`))
 }
 
 main()
