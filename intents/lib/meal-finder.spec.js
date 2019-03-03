@@ -103,6 +103,33 @@ describe('MealFinder -- Gender', async () => {
       gender)
     const result = await mealFinder.find()
     expect(result[0]).toEqual(closestMeal)
+  })  
+
+  it.each([['35144-2'], ['35330-2'], ['35282-2'], ['35152-2'], ['35240-2']])(
+    `Given a address of a service provider with FEMALE restriction,
+    it should NOT return the same meal record when user specifies Male in the query`,
+    async (rec) => {
+
+    const meals = await dataLoader.meals(mealInfoFile)
+    const correctResId = rec
+    const closestMeal = meals.find(m => m.resourceId === correctResId)
+    const location = await Location.fromAddress(closestMeal.address)
+    const datetime = moment()
+        .day(closestMeal.dayOfWeek[0])
+        .hour(closestMeal.startTime.split(':')[0])
+        .minute(closestMeal.startTime.split(':')[1])
+    const age = closestMeal.age[0] + 1
+    
+    const gender = 'male'
+    const mealFinder = new MealFinder(
+      meals, 
+      location,
+      datetime.format("ddd").toLowerCase(), 
+      datetime.format("HH:mm"), 
+      age, 
+      gender)
+    const result = await mealFinder.find()
+    expect(result[0]).not.toEqual(closestMeal)
   })
 
   // all records in the mock records with male restriction
