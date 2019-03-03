@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "standard && jest",
+    "test": "env-cmd .env jest",
     "lint": "standard --fix"
   },
   "repository": {
@@ -28,6 +28,7 @@
   },
   "devDependencies": {
     "dotenv": "^6.2.0",
+    "env-cmd": "^8.0.2",
     "jest": "^23.2.0",
     "standard": "^11.0.1"
   },

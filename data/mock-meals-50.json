@@ -626,7 +626,7 @@
       {
         "startTime": "17:00",
         "endTime": "20:00",
-        "dayOfWeek": [],
+        "dayOfWeek": ["fri"],
         "type": "",
         "notes": "",
         "gender": "male",
